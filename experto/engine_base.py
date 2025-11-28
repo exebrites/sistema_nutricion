@@ -1,0 +1,37 @@
+from experta import KnowledgeEngine
+
+class MotorBase(KnowledgeEngine):
+    """
+    Esta clase maneja el estado de la inferencia y los contenedores de resultados.
+    NO contiene reglas de negocio, solo lógica de gestión.
+    """
+    def __init__(self):
+        super().__init__()
+        # Inicializamos los contenedores de resultados
+        self.riesgos = []
+        self.advertencias = []
+        self.beneficios = []
+        self.clasificacion = None
+
+    def agregar_riesgo(self, mensaje):
+        self.riesgos.append(mensaje)
+
+    def agregar_advertencia(self, mensaje):
+        self.advertencias.append(mensaje)
+
+    def agregar_beneficio(self, mensaje):
+        self.beneficios.append(mensaje)
+    
+    def set_clasificacion(self, tipo):
+        # Solo asignamos si no tiene una clasificación previa (o según tu lógica)
+        if self.clasificacion is None or tipo != "Neutro":
+            self.clasificacion = tipo
+
+    def obtener_reporte(self):
+        """Devuelve un diccionario limpio con los resultados."""
+        return {
+            "riesgos": self.riesgos,
+            "advertencias": self.advertencias,
+            "beneficios": self.beneficios,
+            "clasificacion": self.clasificacion or "Neutro"
+        }
