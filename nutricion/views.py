@@ -4,7 +4,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .models import Alimento, Dieta, DietaAlimento
 from .forms import AlimentoForm
-from .sistema_nutricional import evaluar_nutricion
+# from .sistema_nutricional import evaluar_nutricion
+from experto.evaluador import evaluar_nutricion
 
 from django.core.paginator import Paginator
 # home
