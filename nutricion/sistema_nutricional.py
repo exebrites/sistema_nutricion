@@ -64,7 +64,7 @@ class MotorNutricional(KnowledgeEngine):
     # ---------------- CLASIFICACIÓN FINAL ---------------- #
 
     @Rule(Nutricion(calorias=P(lambda c: c < 150),
-                    grasas_totales=P(lambda g: g < 8),
+                    grasas=P(lambda g: g < 8),
                     sodio=P(lambda s: s < 200),
                     proteinas=P(lambda p: p > 5)))
     def clasificacion_saludable(self):
@@ -73,7 +73,7 @@ class MotorNutricional(KnowledgeEngine):
 
     @Rule(OR(
         Nutricion(calorias=P(lambda c: c >= 150)),
-        Nutricion(grasas_totales=P(lambda g: g >= 15)),
+        Nutricion(grasas=P(lambda g: g >= 15)),
         Nutricion(sodio=P(lambda s: s >= 400))
     ))
     def clasificacion_no_saludable(self):

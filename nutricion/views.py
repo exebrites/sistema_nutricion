@@ -2,10 +2,13 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
+
+from experto.main import evaluar_nutricion
 from .models import Alimento, Dieta, DietaAlimento
 from .forms import AlimentoForm
-# from .sistema_nutricional import evaluar_nutricion
-from experto.evaluador import evaluar_nutricion
+ 
+ 
+
 
 from django.core.paginator import Paginator
 # home
@@ -187,13 +190,14 @@ def validar_alimentos(request):
             "carbohidratos": alimento.carbohidratos,
             "grasas": alimento.grasas,
         }
-        response = evaluar_nutricion(data)
+        response = evaluar_nutricion(data,modo="nutricion")
+        
         resumen[alimento.id] = {
             'alimento': alimento.to_dict(),
             'evaluacion': response
         }
 
-    # return HttpResponse(json.dumps(resumen) )
+ 
     # # 2. Guardamos en la sesión
     # request.session['datos_analisis_temporal'] = resultados_analisis
 
