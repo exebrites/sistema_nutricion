@@ -1,7 +1,9 @@
 from .facts import Nutricion
 from .rules import BaseConocimientoNutricional
 
-def evaluar_nutricion(data):
+def evaluar_nutricion(data,modo="completo"):
+    if modo not in ["validacion","nutricion"]:
+        raise ValueError("Modo inválido. Use 'validacion' o 'nutricion'.")
     # 1. Instanciamos la Base de Conocimiento (que incluye el motor por herencia)
     engine = BaseConocimientoNutricional()
     
@@ -11,9 +13,12 @@ def evaluar_nutricion(data):
     
     # 3. Ejecución
     engine.run()
-    
+    if modo =="validacion":
+        return engine.obtener_reporte_validacion()
+    if modo =="nutricion":
+        return engine.obtener_reporte()
     # 4. Extracción de resultados (usando el método del padre)
-    return engine.obtener_reporte()
+    
 
 # --- PRUEBA ---
 # if __name__ == "__main__":

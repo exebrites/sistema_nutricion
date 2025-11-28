@@ -190,7 +190,7 @@ def validar_alimentos(request):
             "carbohidratos": alimento.carbohidratos,
             "grasas": alimento.grasas,
         }
-        response = evaluar_nutricion(data)
+        response = evaluar_nutricion(data,modo="nutricion")
         
         resumen[alimento.id] = {
             'alimento': alimento.to_dict(),

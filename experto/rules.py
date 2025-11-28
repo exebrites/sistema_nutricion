@@ -1,6 +1,7 @@
-from experta import Rule, P, AS, OR
-from .facts import Nutricion  # Importamos los hechos
-from .engine_base import MotorBase # Importamos el motor base
+from datetime import datetime
+from experta import Rule, P,OR, AS
+from .facts import Nutricion, Validacion  # Importamos Validacion
+from .engine_base import MotorBase
 
 class BaseConocimientoNutricional(MotorBase):
     """
@@ -32,7 +33,8 @@ class BaseConocimientoNutricional(MotorBase):
 
     @Rule(Nutricion(carbohidratos=P(lambda c: c > 40)))
     def advertencia_carbohidratos(self):
-        self.agregar_advertencia("Alto en carbohidratos: balancear con proteínas.")
+        self.agregar_advertencia(
+            "Alto en carbohidratos: balancear con proteínas.")
 
     # ---------------- BENEFICIOS ---------------- #
     @Rule(Nutricion(proteinas=P(lambda p: p >= 15)))
@@ -66,7 +68,55 @@ class BaseConocimientoNutricional(MotorBase):
     # Regla por defecto (baja prioridad o catch-all)
     @Rule(AS.f << Nutricion())
     def clasificacion_default(self, f):
-        # La lógica de "si no existe clasificacion, pon neutro" 
+        # La lógica de "si no existe clasificacion, pon neutro"
         # ya la manejamos en el método obtener_reporte o set_clasificacion del padre,
         # pero aquí podemos forzar un cálculo si es necesario.
         pass
+
+
+class ReglasValidacion(MotorBase):
+    """
+    Motor dedicado a validar la integridad de los datos 
+    (fechas, stock, nombres, límites extremos).
+    """
+
+    # ---------------- VALIDACIONES DE ERROR ---------------- #
+    @Rule(Validacion(calorias=P(lambda c: c <= 0)))
+    def calorias_invalidas(self):
+        self.agregar_error("Las calorías deben ser mayores a 0.")
+
+    @Rule(Validacion(nombre=P(lambda n: len(n.strip()) == 0)))
+    def nombre_vacio(self):
+        self.agregar_error("El nombre no puede estar vacío.")
+
+    @Rule(Validacion(fecha_vencimiento=P(lambda f: f < datetime.now())))
+    def alimento_vencido(self):
+        self.agregar_error("El alimento está vencido.")
+
+    @Rule(Validacion(stock=P(lambda s: s < 0)))
+    def stock_negativo(self):
+        self.agregar_error("El stock no puede ser negativo.")
+
+    # ---------------- ADVERTENCIAS ---------------- #
+    # Nota: Usamos Validacion(), no Nutricion() aquí
+
+    @Rule(Validacion(sodio=P(lambda s: s > 600)))
+    def alto_en_sodio(self):
+        self.agregar_advertencia("Alto en sodio (Validación).")
+
+    @Rule(Validacion(grasas=P(lambda g: g > 20)))
+    def grasas_altas(self):
+        self.agregar_advertencia("Contenido de grasas elevado.")
+
+    @Rule(Validacion(stock=P(lambda s: 0 <= s <= 3)))
+    def stock_bajo(self):
+        self.agregar_advertencia("Stock bajo, reponer pronto.")
+
+    # ---------------- INFO ---------------- #
+    @Rule(Validacion(calorias=P(lambda c: c < 100)))
+    def bajo_calorias(self):
+        self.agregar_info("Producto bajo en calorías.")
+
+    @Rule(Validacion(calorias=P(lambda c: c >= 250)))
+    def alto_calorias(self):
+        self.agregar_info("Producto alto en calorías.")
