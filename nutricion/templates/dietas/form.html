@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% url 'lista_dietas' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar dieta" subtitle="Crear dieta" back_url=url_volver %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="row">
+            <div class="col-sm-6">  
+                <div class="form-group">
+                    <label for="nombre" class="control-label">Nombre:</label>
+                    <input type="text" name="nombre" id="nombre" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion" class="control-label">Descripci&oacute;n:</label>
+                    <textarea name="descripcion" id="descripcion" cols="30" rows="10" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <h3>Alimentos en la dieta:</h3>
+                {% if error %}
+                <p class="text-danger">{{ error }}</p>
+                {% endif %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'alimentos_dieta' %}" class="btn btn-primary btn-sm">Agregar alimentos a la
+                        dieta</a>
+                    <a href="{% url 'vaciar_alimento_dieta' %}" class="btn btn-warning btn-sm">Vaciar alimentos</a>
+                </div>
+                {% if carrito_dieta %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Calorías</th>
+                            <th>Cantidad</th>
+                            <th>Unidad</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in carrito_dieta %}
+                        <tr>
+                            <td>{{ a.nombre }}</td>
+                            <td>{{ a.calorias }}</td>
+                            <td>{{ a.cantidad }} </td>
+                            <td>{{ a.unidad }}</td>
+                            <td>
+                                <a href="{% url 'borrar_alimento_dieta' a.id %}"
+                                    class="btn btn-danger btn-sm btn-xs">Borrar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No hay alimentos en la dieta.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-offset-2 col-sm-10">
+            <input type="submit" value="Crear dieta" class="btn btn-success">
+            <br><br>
+            <a href="{% url 'validar_alimentos' %}" class="btn btn-primary">Validar alimentos</a>
+
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}

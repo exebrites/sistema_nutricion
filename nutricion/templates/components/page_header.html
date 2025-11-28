@@ -1,0 +1,18 @@
+<div class="row align-items-center mb-4 border-bottom pb-2">
+    <div class="col-3">
+        {% if back_url %}
+            {% include 'components/btn_back.html' with url=back_url %}
+        {% endif %}
+    </div>
+
+    <div class="col-6 text-center">
+        <h1 class="h2 m-0 fw-bold">{{ title }}</h1>
+        
+        {% if subtitle %}
+            <h2 class="h6 text-muted mt-1 mb-0">{{ subtitle }}</h2>
+        {% endif %}
+    </div>
+
+    <div class="col-3 text-end">
+    </div>
+</div>

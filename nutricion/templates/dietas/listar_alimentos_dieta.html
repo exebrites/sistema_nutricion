@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Seleccionar Alimentos{% endblock %}
+
+{% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+{% url 'create_dieta' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar dieta" subtitle="Seleccionar alimentos" back_url=url_volver %}
+
+    {% if error %}
+        <p class="text-danger">{{ error }}</p>
+    {% endif %}
+    
+    <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="dieta_id" value="{{ dieta_id }}">
+        
+        <label>Alimento:</label>
+        <select class="js-example-basic-single" name="alimento" style="width: 100%;">
+            {% for a in alimentos %}
+                <option value="{{ a.id }}">{{ a.nombre }}</option>
+            {% endfor %}
+        </select>
+        
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad:</label>
+            <input type="number" name="cantidad" required min="1" class="form-control" id="cantidad">
+        </div>
+
+        <div class="mb-3">
+            <label for="unidad" class="form-label">Unidad:</label>
+            <select name="unidad" required class="form-select" id="unidad">
+                <option value="g">Gramos</option>
+                <option value="ml">Mililitros</option>
+                <option value="l">Litros</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-success mt-3">Guardar</button>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('.js-example-basic-single').select2({
+                placeholder: "Selecciona una opción",
+                allowClear: true
+            });
+        });
+    </script>
+{% endblock %}

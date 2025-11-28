@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar alimentos" subtitle="Lista de Alimentos" back_url=url_volver %}
+
+ 
+<a href="{% url 'create_alimento' %}" class="btn btn-primary">Crear Alimento</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Calorías</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in page_obj %}
+        <tr>
+            <td>{{ a.nombre }}</td>
+            <td>{{ a.calorias }}</td>
+            <td>
+                <a href="{% url 'ver_alimento' a.id %}" class="btn btn-success btn-sm">Ver</a>
+                <a href="{% url 'editar_alimento' a.id %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'eliminar_alimento' a.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include 'components/pagination.html' %}
+{% endblock %}

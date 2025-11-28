@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Bienvenido</h1>
+    <p class="lead">Esta es la página de inicio de la aplicación de nutrición.</p>
+    <hr class="my-4">
+    <p>En esta aplicación podrás registrar tus alimentos y sus dietas.</p>
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="{% url 'lista_alimentos' %}" role="button">Alimentos</a>
+        <a class="btn btn-success btn-lg" href="{% url 'lista_dietas' %}" role="button">Dieta</a>
+    </p>
+</div>
+{% endblock %}
+

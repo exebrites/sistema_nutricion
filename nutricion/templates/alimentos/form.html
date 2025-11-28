@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_alimentos' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar alimentos" subtitle="Crear alimento" back_url=url_volver %}
+
+
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+
+{% if success %}
+<p style="color: green">{{ success }}</p>
+{% endif %}
+
+{% if form.errors %}
+<ul style="color: red">
+    {% for error in form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if advertencias %}
+<h3>Advertencias del sistema experto:</h3>
+<ul style="color: orange">
+    {% for a in advertencias %}
+    <li>{{ a }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if info %}
+<h3>Clasificaciones:</h3>
+<ul style="color: blue">
+    {% for i in info %}
+    <li>{{ i }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
