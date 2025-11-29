@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta
+from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta,HabitoAlimentario
 from .forms import AlimentoForm
 
 
@@ -348,6 +348,9 @@ def alimentos_habitos(request):
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
     context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
+    ## obtener habitos alimentarios y enviarlos al template
+    habitos_alimentarios = HabitoAlimentario.objects.all()
+    context["habitos_alimentarios"] = habitos_alimentarios
     
     if request.method == "POST":
         # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
