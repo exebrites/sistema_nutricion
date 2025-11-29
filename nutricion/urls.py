@@ -24,4 +24,9 @@ urlpatterns = [
     path('agregar_sintoma_motivo_consulta/', views.agregar_sintoma_motivo_consulta, name='agregar_sintoma_motivo_consulta'),
     path('vaciar_sintomas_seleccionados/', views.vaciar_sintomas_seleccionados, name='vaciar_sintomas_seleccionados'),
     path('motivo_consulta/', views.motivo_consulta, name='motivo_consulta'),
+    path('alimentos_habitos/', views.alimentos_habitos, name='alimentos_habitos'),
+    path('agregar_alimento/', views.agregar_alimento, name='agregar_alimento'),
+    path('vaciar_lista_alimentos_seleccionados/', views.vaciar_lista_alimentos_seleccionados, name='vaciar_lista_alimentos_seleccionados'),
+    path('crear_atropometria/', views.crear_atropometria, name='crear_atropometria'),
+    path('informacion_general/', views.informacion_general, name='informacion_general'),
 ]

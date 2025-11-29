@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Alimento y habitos alimenticios</h1>
+    <p>Por favor, describe tus alimentos y habitos alimenticios.</p>
+    <h2>Alimentos</h2>
+    <div class="row">
+        <div class="col-sm-6">
+            <form action="{% url 'agregar_alimento' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="alimentos" class="form-label">Alimentos</label>
+                    <select name="alimentos" id="alimentos" class="form-select">
+                        <option value="">Seleccione un alimento</option>
+                        <option value="sandwiches">Sandwiches</option>
+                        <option value="papas_fritas">Papas fritas</option>
+                        <option value="refresco">Refresco</option>
+                        <option value="boleria">Boleria</option>
+                        <option value="frutas">Frutas</option>
+                        <option value="verduras">Verduras</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="consume" class="form-label">Consume</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="consume" id="consume">
+                        <label class="form-check-label" for="consume">S</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar alimento</button>
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <h2>Lista de alimentos seleccionados</h2>
+            <a href="{% url 'vaciar_lista_alimentos_seleccionados' %}">vaciar alimentos</a>
+            <ul class="list-group">
+                {% for a in lista_alimentos_seleccionados %}
+                <li class="list-group-item">{{ a.nombre }} ({{ a.consume|yesno:"Si,No" }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <hr>
+    <h3>habitos alimenticios</h3>
+    <form action="{% url 'alimentos_habitos' %}" method="post">
+
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="habitos" class="form-label">Habitos alimenticios</label>
+            <select name="habitos" id="habitos" class="form-select">
+                <option value="">Seleccione un habito alimenticio</option>
+                <option value="diario">Diario</option>
+                <option value="ocasional">Ocasional</option>
+                <option value="frecuente">Frecuente</option>
+            </select>
+        </div>
+        <br>
+            <button type="submit" class="btn btn-primary">Guardar habitos alimenticios</button>
+    </form>
+{% endblock %}
