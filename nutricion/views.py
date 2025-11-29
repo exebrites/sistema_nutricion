@@ -341,9 +341,14 @@ def motivo_consulta(request):
 
 def alimentos_habitos(request):
     context = {}
+    #obtener alimento y enviarlos al templte
+    alimentos = Alimento.objects.all()
+    context["alimentos"] = alimentos
+    #obtener alimentos seleccionados de la sesion
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
     context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
+
     if request.method == "POST":
         # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
         habito_alimenticio = request.POST.get('habitos', '').strip()
@@ -375,7 +380,7 @@ def agregar_alimento(request):
                 "lista_alimentos_seleccionados": lista_alimentos_seleccionados
             }
             # return HttpResponse(json.dumps(context), content_type="application/json")
-        return render(request, "consultas/alimentos_habitos.html", context)
+        return redirect('alimentos_habitos')
 
     return HttpResponse("Método no permitido.", status=405)
 

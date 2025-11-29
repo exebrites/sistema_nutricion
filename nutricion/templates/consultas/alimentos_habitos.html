@@ -12,12 +12,9 @@
                     <label for="alimentos" class="form-label">Alimentos</label>
                     <select name="alimentos" id="alimentos" class="form-select">
                         <option value="">Seleccione un alimento</option>
-                        <option value="sandwiches">Sandwiches</option>
-                        <option value="papas_fritas">Papas fritas</option>
-                        <option value="refresco">Refresco</option>
-                        <option value="boleria">Boleria</option>
-                        <option value="frutas">Frutas</option>
-                        <option value="verduras">Verduras</option>
+                        {% for a in alimentos %}
+                            <option value="{{ a.id }}">{{ a.nombre }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="mb-3">
