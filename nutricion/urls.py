@@ -29,4 +29,5 @@ urlpatterns = [
     path('vaciar_lista_alimentos_seleccionados/', views.vaciar_lista_alimentos_seleccionados, name='vaciar_lista_alimentos_seleccionados'),
     path('crear_atropometria/', views.crear_atropometria, name='crear_atropometria'),
     path('informacion_general/', views.informacion_general, name='informacion_general'),
+    
 ]

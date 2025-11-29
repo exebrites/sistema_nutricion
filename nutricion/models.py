@@ -66,7 +66,7 @@ class Paciente(models.Model):
     numero_telefono = models.CharField(max_length=20)
     edad = models.IntegerField()
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} {self.apellido}, nacido el {self.fecha_nacimiento.strftime('%d-%m-%Y')}"
     #calcular edad 
     def calcular_edad(self):
         from datetime import date
@@ -130,4 +130,4 @@ class Sintoma(models.Model):
     descripcion = models.TextField(blank=True)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.id}: {self.nombre} - {self.descripcion}"
