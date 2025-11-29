@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta
+from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta,HabitoAlimentario
 from .forms import AlimentoForm
 
 
@@ -274,7 +274,7 @@ def agregar_sintoma_motivo_consulta(request):
         context["sintomas_seleccionadas"] = sintomas_sesion
         context["sintomas"] = sintomas
         # Aquí puedes procesar los síntomas seleccionados según tus necesidades
-        return render(request, "consultas/motivo_consulta.html", context)
+        return redirect('motivo_consulta')
         # return render(request, "consultas/motivo_consulta.html", context)
     return HttpResponse("Método no permitido.", status=405)
 
@@ -328,6 +328,9 @@ def motivo_consulta(request):
                 sintoma = get_object_or_404(Sintoma, id=sintoma_data["id"])
                 motivo_consulta.sintomas.add(sintoma)
             motivo_consulta.save()
+            # Limpiar la lista de síntomas seleccionados en la sesión
+            request.session["sintomas_seleccionadas"] = []
+            request.session["paciente_id"] = paciente.id
         except Exception as e:
             
             return HttpResponse(f"Error al guardar el motivo de consulta: {e}", status=500)
@@ -348,13 +351,45 @@ def alimentos_habitos(request):
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
     context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
+    ## obtener habitos alimentarios y enviarlos al template
+    habitos_alimentarios = HabitoAlimentario.objects.all()
+    context["habitos_alimentarios"] = habitos_alimentarios
+    #obtener el paciente 
+    paciente_id = request.session.get("paciente_id")
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        context["paciente"] = paciente
+
+    
 
     if request.method == "POST":
         # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
         habito_alimenticio = request.POST.get('habitos', '').strip()
         lista_alimentos = request.session.get("lista_alimentos_seleccionados", [])
+        paciente_id = request.POST.get('paciente_id', '')
+        paciente = get_object_or_404(Paciente, id=paciente_id)
         
-        # return HttpResponse(f"Hábitos: {habito_alimenticio}, Alimentos: {', '.join([a['nombre'] for a in lista_alimentos])}")
+        # Guardar los hábitos alimentarios y los alimentos en la base de datos
+        try:
+            # Aquí puedes guardar los datos en la base de datos según tu modelo
+            dieta = Dieta.objects.create(
+                nombre="Dieta del paciente",
+                descripcion="Dieta creada durante la consulta",
+                paciente=paciente,
+            )
+            for alimento_data in lista_alimentos:
+                alimento = get_object_or_404(Alimento, id=alimento_data["id"])
+                DietaAlimento.objects.create(
+                    dieta=dieta,
+                    alimento=alimento,
+                    cantidad=0,
+                    unidad='al'
+                )
+        except Exception as e:
+            return HttpResponse(f"Error al guardar los datos: {e}", status=500)
+
+
+
         # return HttpResponse("Datos de alimentos y hábitos recibidos.")
         return redirect('crear_atropometria')
     return render(request, "consultas/alimentos_habitos.html",context)
@@ -363,16 +398,16 @@ def alimentos_habitos(request):
 def agregar_alimento(request):
     context = {}
     if request.method == "POST":
-        alimento = request.POST.get("alimentos")
+        alimento_seleccionado = request.POST.get("alimentos")
         if "lista_alimentos_seleccionados" not in request.session:
             request.session["lista_alimentos_seleccionados"] = []
         lista_alimentos_seleccionados = request.session["lista_alimentos_seleccionados"]
-        if alimento not in [a["id"] for a in lista_alimentos_seleccionados]:
-    #         alimento = Alimento.objects.get(id=alimento_id)
+        if alimento_seleccionado not in [a["id"] for a in lista_alimentos_seleccionados]:
+            alimento = Alimento.objects.get(id=alimento_seleccionado)
             consume = request.POST.get("consume") == "on"
             lista_alimentos_seleccionados.append({
-                "id": alimento,
-                "nombre": alimento,
+                "id": alimento.id,
+                "nombre": alimento.nombre,
                 "consume": consume
             })
             request.session["lista_alimentos_seleccionados"] = lista_alimentos_seleccionados

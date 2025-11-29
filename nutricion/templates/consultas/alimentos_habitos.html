@@ -42,13 +42,15 @@
     <form action="{% url 'alimentos_habitos' %}" method="post">
 
         {% csrf_token %}
+
+        <input type="hidden" name="paciente_id" value="{{ paciente.id }}">
         <div class="mb-3">
-            <label for="habitos" class="form-label">Habitos alimenticios</label>
+            <label for="habitos" class="form-label">Habitos alimentarios</label>
             <select name="habitos" id="habitos" class="form-select">
-                <option value="">Seleccione un habito alimenticio</option>
-                <option value="diario">Diario</option>
-                <option value="ocasional">Ocasional</option>
-                <option value="frecuente">Frecuente</option>
+                <option value="">Seleccione un habito alimentario</option>
+                {% for h in habitos_alimentarios %}
+                    <option value="{{ h.id }}">{{ h.nombre }}</option>
+                {% endfor %}
             </select>
         </div>
         <br>
