@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma
+from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta
 from .forms import AlimentoForm
 
 
@@ -316,14 +316,24 @@ def motivo_consulta(request):
         sintomas_observados = request.session.get("sintomas_seleccionadas", [])
         paciente_id = request.POST.get('paciente', '')
         paciente = get_object_or_404(Paciente, id=paciente_id)
-        
-        
-    
-        return HttpResponse(f"Motivo: {motivo}, Observaciones: {observaciones}, Síntomas: {', '.join([s['nombre'] for s in sintomas_observados])}, Paciente: {paciente.nombre} {paciente.apellido}")
         # Guardar el motivo de consulta y los síntomas en la base de datos
         
+        try:
+            motivo_consulta = MotivoConsulta.objects.create(
+                paciente=paciente,
+                motivo=motivo,
+                observaciones=observaciones
+            )
+            for sintoma_data in sintomas_observados:
+                sintoma = get_object_or_404(Sintoma, id=sintoma_data["id"])
+                motivo_consulta.sintomas.add(sintoma)
+            motivo_consulta.save()
+        except Exception as e:
+            
+            return HttpResponse(f"Error al guardar el motivo de consulta: {e}", status=500)
     
         
+    
         return redirect('alimentos_habitos')
 
     return render(request, "consultas/motivo_consulta.html", context)

@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 # Create your models here.
@@ -100,8 +101,9 @@ class Antropometria(models.Model):
     
 class MotivoConsulta(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    fecha_consulta = models.DateField()
+    fecha_consulta = models.DateField(default=datetime.date.today)
     motivo = models.TextField()
+    observaciones = models.TextField(blank=True)
     objetivos_peso = models.CharField(max_length=200, choices=[
         ('P', 'Pérdida de peso'),
         ('M', 'Mantenimiento del peso actual'),
@@ -121,9 +123,13 @@ class MotivoConsulta(models.Model):
         ('I', 'Intolerancias alimentarias')
     ], help_text='Restricciones alimentarias')
     
+    sintomas = models.ManyToManyField('Sintoma', blank=True)
+
+    
     def __str__(self):
         
         return f"Motivo de consulta de {self.paciente.nombre} el {self.fecha_consulta}"
+    
     
 class Sintoma(models.Model):
     nombre = models.CharField(max_length=100)
