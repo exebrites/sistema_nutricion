@@ -1,10 +1,11 @@
 import json
+from pyexpat.errors import messages
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento
+from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta
 from .forms import AlimentoForm
 
 
@@ -212,35 +213,65 @@ def crear_paciente(request):
     context = {}
     if request.method == "POST":
         nombre = request.POST.get("nombre")
+        apellido = request.POST.get("apellido")
         edad = request.POST.get("edad")
         sexo = request.POST.get("sexo")
+        fecha_nacimiento = request.POST.get("fecha_nacimiento")
+        direccion_residencial = request.POST.get("direccion_residencial")
+        numero_telefono = request.POST.get("numero_telefono")
+        
         # 1. Aquí puedes guardar los datos del paciente en la base de datos
-        datos_paciente = {
-            "nombre": nombre,
-            "edad": edad,
-            "sexo": sexo
-        }
-
-        context["datos_paciente"] = datos_paciente
-        return render(request, "consultas/motivo_consulta.html", context)
+        # 2. Controlar que el nombre y apellido no existan en la base de datos
+        paciente_existe = Paciente.objects.filter(nombre=nombre, apellido=apellido).first()
+        if paciente_existe:
+            context["error"] = "El paciente con nombre {} y apellido {} ya existe en la base de datos.".format(nombre, apellido)
+            return render(request, "consultas/primera_consulta.html", context)
+        try:
+            paciente  = Paciente.objects.create(
+                nombre=nombre,
+                apellido=apellido,
+                sexo=sexo,
+                edad=edad,
+                fecha_nacimiento=fecha_nacimiento,
+                direccion_residencial=direccion_residencial,
+                numero_telefono=numero_telefono,
+            )
+            request.session["success"] = "Paciente creado exitosamente."
+            request.session["paciente_id"] = paciente.id
+        except Exception as e:
+            return HttpResponse(f"Error al crear paciente: {e}", status=500)
+        
+        
+        return redirect('motivo_consulta')
 
     return HttpResponse("Método no permitido.", status=405)
 
 
 def agregar_sintoma_motivo_consulta(request):
     # texto: "fatiga,dolor de cabeza,..."
-    sintomas_raw = request.POST.get('sintomas', '')
-    sintomas = [s.strip() for s in sintomas_raw.split(',') if s.strip()]
+    sintomas = Sintoma.objects.all()
     context = {}
     if "sintomas_seleccionadas" not in request.session:
         request.session["sintomas_seleccionadas"] = []
     if request.method == "POST":
-        sintomas_seleccionados = request.POST.getlist("sintoma_seleccionado")
-        sintomas_seleccionadas = request.session["sintomas_seleccionadas"]
-        sintomas_seleccionados = [
-            s for s in sintomas_seleccionados if s not in sintomas_seleccionadas]
-        request.session["sintomas_seleccionadas"] += sintomas_seleccionados
-        context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
+        id_sintoma_seleccionado = request.POST.getlist("sintoma_seleccionado")
+        sintoma_seleccionado = Sintoma.objects.filter(id__in=id_sintoma_seleccionado)
+        # agregar el sintoma seleccionado a la sesion y verifica duplicados
+        # Obtener lista actual de la sesión
+        sintomas_sesion = request.session["sintomas_seleccionadas"]
+        ids_existentes = [s['id'] for s in sintomas_sesion]
+        
+        # Agregar solo los síntomas que no están duplicados
+        for sintoma in sintoma_seleccionado:
+            if sintoma.id not in ids_existentes:
+                sintomas_sesion.append({
+                    "id": sintoma.id,
+                    "nombre": sintoma.nombre
+                })
+        request.session["sintomas_seleccionadas"] = sintomas_sesion
+
+        #datos al template
+        context["sintomas_seleccionadas"] = sintomas_sesion
         context["sintomas"] = sintomas
         # Aquí puedes procesar los síntomas seleccionados según tus necesidades
         return render(request, "consultas/motivo_consulta.html", context)
@@ -251,20 +282,58 @@ def agregar_sintoma_motivo_consulta(request):
 def vaciar_sintomas_seleccionados(request):
     request.session["sintomas_seleccionadas"] = []
     return redirect('motivo_consulta')
-
+ 
 
 def motivo_consulta(request):
+    # return HttpResponse("sintomas...")
     context = {}
-    if "sintomas" not in request.session:
-        request.session["sintomas"] = ['fatiga', 'dolor de cabeza', 'mareos',
-                                       'apnea del sueño', 'falta de energia', 'presion arterial alta']
-    context["sintomas"] = request.session["sintomas"]
+    context={'success': request.session['success']}
+    #1. eliminar el mensaje de exito de la sesion
+    sintomas = Sintoma.objects.all()
+    context["sintomas"] = sintomas
+    #obtener sintomas seleccionados de la sesion
+    if "sintomas_seleccionadas" not in request.session:
+        request.session["sintomas_seleccionadas"] = []
+    context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
+
+    #obtener pacientes y pasar 
+    pacientes= Paciente.objects.all()
+    context["pacientes"] = pacientes
+
+    # obtener paciente creado recientemente
+    paciente_id = request.session.get("paciente_id")
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        context["paciente"] = paciente
+        # eliminar el id de la sesion
+        del request.session["paciente_id"]
+
     if request.method == "POST":
         # Aquí puedes procesar los datos del motivo de consulta según tus necesidades
+    
         motivo = request.POST.get('motivo', '').strip()
         observaciones = request.POST.get('observaciones', '')
         sintomas_observados = request.session.get("sintomas_seleccionadas", [])
-        # return HttpResponse(f"Motivo: {motivo}, Observaciones: {observaciones}, Síntomas: {', '.join(sintomas_observados)}")
+        paciente_id = request.POST.get('paciente', '')
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        # Guardar el motivo de consulta y los síntomas en la base de datos
+        
+        try:
+            motivo_consulta = MotivoConsulta.objects.create(
+                paciente=paciente,
+                motivo=motivo,
+                observaciones=observaciones
+            )
+            for sintoma_data in sintomas_observados:
+                sintoma = get_object_or_404(Sintoma, id=sintoma_data["id"])
+                motivo_consulta.sintomas.add(sintoma)
+            motivo_consulta.save()
+        except Exception as e:
+            
+            return HttpResponse(f"Error al guardar el motivo de consulta: {e}", status=500)
+    
+        
+    
         return redirect('alimentos_habitos')
 
     return render(request, "consultas/motivo_consulta.html", context)
