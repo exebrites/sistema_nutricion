@@ -348,7 +348,7 @@ def alimentos_habitos(request):
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
     context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
-
+    
     if request.method == "POST":
         # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
         habito_alimenticio = request.POST.get('habitos', '').strip()
@@ -363,16 +363,16 @@ def alimentos_habitos(request):
 def agregar_alimento(request):
     context = {}
     if request.method == "POST":
-        alimento = request.POST.get("alimentos")
+        alimento_seleccionado = request.POST.get("alimentos")
         if "lista_alimentos_seleccionados" not in request.session:
             request.session["lista_alimentos_seleccionados"] = []
         lista_alimentos_seleccionados = request.session["lista_alimentos_seleccionados"]
-        if alimento not in [a["id"] for a in lista_alimentos_seleccionados]:
-    #         alimento = Alimento.objects.get(id=alimento_id)
+        if alimento_seleccionado not in [a["id"] for a in lista_alimentos_seleccionados]:
+            alimento = Alimento.objects.get(id=alimento_seleccionado)
             consume = request.POST.get("consume") == "on"
             lista_alimentos_seleccionados.append({
-                "id": alimento,
-                "nombre": alimento,
+                "id": alimento.id,
+                "nombre": alimento.nombre,
                 "consume": consume
             })
             request.session["lista_alimentos_seleccionados"] = lista_alimentos_seleccionados
