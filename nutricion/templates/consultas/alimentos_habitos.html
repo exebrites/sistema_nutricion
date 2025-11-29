@@ -42,6 +42,8 @@
     <form action="{% url 'alimentos_habitos' %}" method="post">
 
         {% csrf_token %}
+
+        <input type="hidden" name="paciente_id" value="{{ paciente.id }}">
         <div class="mb-3">
             <label for="habitos" class="form-label">Habitos alimentarios</label>
             <select name="habitos" id="habitos" class="form-select">
