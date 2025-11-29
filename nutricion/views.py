@@ -257,7 +257,7 @@ def motivo_consulta(request):
     context = {}
     if "sintomas" not in request.session:
         request.session["sintomas"] = ['fatiga', 'dolor de cabeza', 'mareos',
-                'apnea del sueño', 'falta de energia', 'presion arterial alta']
+                                       'apnea del sueño', 'falta de energia', 'presion arterial alta']
     context["sintomas"] = request.session["sintomas"]
     if request.method == "POST":
         # Aquí puedes procesar los datos del motivo de consulta según tus necesidades
@@ -265,6 +265,73 @@ def motivo_consulta(request):
         observaciones = request.POST.get('observaciones', '')
         sintomas_observados = request.session.get("sintomas_seleccionadas", [])
         # return HttpResponse(f"Motivo: {motivo}, Observaciones: {observaciones}, Síntomas: {', '.join(sintomas_observados)}")
-        return HttpResponse("motivo de consulta guardados correctamente.")
+        return redirect('alimentos_habitos')
 
     return render(request, "consultas/motivo_consulta.html", context)
+
+
+def alimentos_habitos(request):
+    context = {}
+    if "lista_alimentos_seleccionados" not in request.session:
+        request.session["lista_alimentos_seleccionados"] = []
+    context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
+    if request.method == "POST":
+        # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
+        habito_alimenticio = request.POST.get('habitos', '').strip()
+        lista_alimentos = request.session.get("lista_alimentos_seleccionados", [])
+        
+        # return HttpResponse(f"Hábitos: {habito_alimenticio}, Alimentos: {', '.join([a['nombre'] for a in lista_alimentos])}")
+        # return HttpResponse("Datos de alimentos y hábitos recibidos.")
+        return redirect('crear_atropometria')
+    return render(request, "consultas/alimentos_habitos.html",context)
+
+
+def agregar_alimento(request):
+    context = {}
+    if request.method == "POST":
+        alimento = request.POST.get("alimentos")
+        if "lista_alimentos_seleccionados" not in request.session:
+            request.session["lista_alimentos_seleccionados"] = []
+        lista_alimentos_seleccionados = request.session["lista_alimentos_seleccionados"]
+        if alimento not in [a["id"] for a in lista_alimentos_seleccionados]:
+    #         alimento = Alimento.objects.get(id=alimento_id)
+            consume = request.POST.get("consume") == "on"
+            lista_alimentos_seleccionados.append({
+                "id": alimento,
+                "nombre": alimento,
+                "consume": consume
+            })
+            request.session["lista_alimentos_seleccionados"] = lista_alimentos_seleccionados
+            context = {
+                "lista_alimentos_seleccionados": lista_alimentos_seleccionados
+            }
+            # return HttpResponse(json.dumps(context), content_type="application/json")
+        return render(request, "consultas/alimentos_habitos.html", context)
+
+    return HttpResponse("Método no permitido.", status=405)
+
+def vaciar_lista_alimentos_seleccionados(request):
+    request.session["lista_alimentos_seleccionados"] = []
+    return redirect('alimentos_habitos')
+
+def crear_atropometria(request):
+    context = {}
+    if request.method == "POST":
+        peso = request.POST.get("peso")
+        altura = request.POST.get("altura")
+        circunferencia_abdominal = request.POST.get("circunferencia_abdominal")
+        imc = None
+        if peso and altura:
+            try:
+                peso_val = float(peso)
+                altura_val = float(altura) / 100  # Convertir cm a metros
+                imc = peso_val / (altura_val ** 2)
+            except ValueError:
+                imc = "Valores inválidos"
+        context["imc"] = imc
+        # return HttpResponse(f"Peso: {peso} kg, Altura: {altura} cm, IMC: {imc}, Circunferencia Abdominal: {circunferencia_abdominal} cm")
+        return redirect('informacion_general')
+    return render(request, "consultas/antropometria.html",context)
+
+def informacion_general(request):
+    return render(request, "consultas/informacion_general.html")
