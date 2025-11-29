@@ -137,3 +137,8 @@ class Sintoma(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.nombre} - {self.descripcion}"
+class HabitoAlimentario(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    def __str__(self):
+        return f"Hábito alimentario de {self.nombre}: {self.descripcion}"
