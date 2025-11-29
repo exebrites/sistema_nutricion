@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+    {% if success %}
+        <div class="alert alert-success" role="alert">
+            {{ success }}
+        </div>
+    {% endif %}
     <h1>Motivo de la consulta</h1>
     <p>Por favor, describe el motivo de tu consulta nutricional.</p>
     <h2>sintomas</h2>

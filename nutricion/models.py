@@ -67,6 +67,12 @@ class Paciente(models.Model):
     edad = models.IntegerField()
     def __str__(self):
         return self.nombre
+    #calcular edad 
+    def calcular_edad(self):
+        from datetime import date
+        today = date.today()
+        edad = today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        return edad
 
 class Antropometria(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)

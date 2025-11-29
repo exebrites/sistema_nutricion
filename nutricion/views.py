@@ -1,10 +1,11 @@
 import json
+from pyexpat.errors import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento
+from .models import Alimento, Dieta, DietaAlimento, Paciente
 from .forms import AlimentoForm
 
 
@@ -212,16 +213,33 @@ def crear_paciente(request):
     context = {}
     if request.method == "POST":
         nombre = request.POST.get("nombre")
+        apellido = request.POST.get("apellido")
         edad = request.POST.get("edad")
         sexo = request.POST.get("sexo")
+        fecha_nacimiento = request.POST.get("fecha_nacimiento")
+        direccion_residencial = request.POST.get("direccion_residencial")
+        numero_telefono = request.POST.get("numero_telefono")
+        
         # 1. Aquí puedes guardar los datos del paciente en la base de datos
-        datos_paciente = {
-            "nombre": nombre,
-            "edad": edad,
-            "sexo": sexo
-        }
-
-        context["datos_paciente"] = datos_paciente
+        # 2. Controlar que el nombre y apellido no existan en la base de datos
+        paciente_existe = Paciente.objects.filter(nombre=nombre, apellido=apellido).first()
+        if paciente_existe:
+            context["error"] = "El paciente con nombre {} y apellido {} ya existe en la base de datos.".format(nombre, apellido)
+            return render(request, "consultas/primera_consulta.html", context)
+        try:
+            paciente  = Paciente.objects.create(
+                nombre=nombre,
+                apellido=apellido,
+                sexo=sexo,
+                edad=edad,
+                fecha_nacimiento=fecha_nacimiento,
+                direccion_residencial=direccion_residencial,
+                numero_telefono=numero_telefono,
+            )
+        except Exception as e:
+            return HttpResponse(f"Error al crear paciente: {e}", status=500)
+        
+        context["success"] = "Paciente creado exitosamente."
         return render(request, "consultas/motivo_consulta.html", context)
 
     return HttpResponse("Método no permitido.", status=405)
