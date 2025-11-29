@@ -125,16 +125,9 @@ class MotivoConsulta(models.Model):
         
         return f"Motivo de consulta de {self.paciente.nombre} el {self.fecha_consulta}"
     
-class Sintoma (models.Model):
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    fecha_registro = models.DateField()
-    sintoma = models.CharField(max_length=100, choices=[
-        ('F', 'Fiebre'),
-        ('D', 'Dolor de cabeza'),
-        ('P', 'Pérdida de cabello'),
-        ('O', 'Otro')
-    ])
-    descripcion = models.TextField()
+class Sintoma(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Síntoma de {self.paciente.nombre} el {self.fecha_registro}: {self.sintoma}"
+        return self.nombre

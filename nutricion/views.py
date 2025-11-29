@@ -236,11 +236,12 @@ def crear_paciente(request):
                 direccion_residencial=direccion_residencial,
                 numero_telefono=numero_telefono,
             )
+            request.session["success"] = "Paciente creado exitosamente."
         except Exception as e:
             return HttpResponse(f"Error al crear paciente: {e}", status=500)
         
-        context["success"] = "Paciente creado exitosamente."
-        return render(request, "consultas/motivo_consulta.html", context)
+        
+        return redirect('motivo_consulta')
 
     return HttpResponse("Método no permitido.", status=405)
 
@@ -272,7 +273,12 @@ def vaciar_sintomas_seleccionados(request):
 
 
 def motivo_consulta(request):
+    # return HttpResponse("sintomas...")
     context = {}
+    context={'success': request.session['success']}
+    #eliminar el mensaje de exito de la sesion
+    del request.session['success']
+    
     if "sintomas" not in request.session:
         request.session["sintomas"] = ['fatiga', 'dolor de cabeza', 'mareos',
                                        'apnea del sueño', 'falta de energia', 'presion arterial alta']
