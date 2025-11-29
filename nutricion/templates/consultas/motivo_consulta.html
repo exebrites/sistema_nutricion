@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Motivo de la consulta</h1>
+    <p>Por favor, describe el motivo de tu consulta nutricional.</p>
+    <h2>sintomas</h2>
+    <div class="row">
+        <div class="col-sm-6">
+            <form action="{% url 'agregar_sintoma_motivo_consulta' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="sintomas" value="{{ sintomas|join:',' }}">                
+                <div class="mb-3">
+                    <label for="sintomas" class="form-label">S ntomas</label>
+                    <select name="sintoma_seleccionado" id="sintoma_seleccionado" class="form-select">
+                        <option value="">Seleccione una opción</option>
+                        {% for s in sintomas %}
+                        <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Agregar sintomas</button>
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <a href="{% url 'vaciar_sintomas_seleccionados' %}">Vaciar sintomas</a>
+            <ul class="list-group">
+                {% for s in sintomas_seleccionadas %}
+                <li class="list-group-item">{{ s }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <h2>Anotaciones</h2>
+    <form action="{% url 'motivo_consulta' %}" method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea name="observaciones" id="observaciones" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="motivo" class="form-label">Motivo de la consulta</label>
+            <textarea name="motivo" id="motivo" class="form-control" rows="3"></textarea>
+        </div>
+        <br>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+{% endblock %}

@@ -18,4 +18,10 @@ urlpatterns = [
     path('ver_dieta/<int:dieta_id>/', views.ver_dieta, name='ver_dieta'),
     path('editar_dieta/<int:dieta_id>/', views.editar_dieta, name='editar_dieta'),
     path('eliminar_dieta/<int:dieta_id>/', views.eliminar_dieta, name='eliminar_dieta'),
+    # primera consulta
+    path('primera_consulta/', views.primera_consulta, name='primera_consulta'),
+    path('crear_paciente/', views.crear_paciente, name='crear_paciente'),
+    path('agregar_sintoma_motivo_consulta/', views.agregar_sintoma_motivo_consulta, name='agregar_sintoma_motivo_consulta'),
+    path('vaciar_sintomas_seleccionados/', views.vaciar_sintomas_seleccionados, name='vaciar_sintomas_seleccionados'),
+    path('motivo_consulta/', views.motivo_consulta, name='motivo_consulta'),
 ]

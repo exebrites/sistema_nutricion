@@ -6,8 +6,6 @@ from django.urls import reverse
 from experto.main import evaluar_nutricion
 from .models import Alimento, Dieta, DietaAlimento
 from .forms import AlimentoForm
- 
- 
 
 
 from django.core.paginator import Paginator
@@ -190,17 +188,83 @@ def validar_alimentos(request):
             "carbohidratos": alimento.carbohidratos,
             "grasas": alimento.grasas,
         }
-        response = evaluar_nutricion(data,modo="nutricion")
-        
+        response = evaluar_nutricion(data, modo="nutricion")
+
         resumen[alimento.id] = {
             'alimento': alimento.to_dict(),
             'evaluacion': response
         }
 
- 
     # # 2. Guardamos en la sesión
     # request.session['datos_analisis_temporal'] = resultados_analisis
 
     # # 3. Redirigimos LIMPIAMENTE (sin argumentos en la URL)
     return render(request, "dietas/validar_alimentos.html", {
         "resumen": resumen})
+# consulta
+
+
+def primera_consulta(request):
+    return render(request, "consultas/primera_consulta.html")
+
+
+def crear_paciente(request):
+    context = {}
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+        edad = request.POST.get("edad")
+        sexo = request.POST.get("sexo")
+        # 1. Aquí puedes guardar los datos del paciente en la base de datos
+        datos_paciente = {
+            "nombre": nombre,
+            "edad": edad,
+            "sexo": sexo
+        }
+
+        context["datos_paciente"] = datos_paciente
+        return render(request, "consultas/motivo_consulta.html", context)
+
+    return HttpResponse("Método no permitido.", status=405)
+
+
+def agregar_sintoma_motivo_consulta(request):
+    # texto: "fatiga,dolor de cabeza,..."
+    sintomas_raw = request.POST.get('sintomas', '')
+    sintomas = [s.strip() for s in sintomas_raw.split(',') if s.strip()]
+    context = {}
+    if "sintomas_seleccionadas" not in request.session:
+        request.session["sintomas_seleccionadas"] = []
+    if request.method == "POST":
+        sintomas_seleccionados = request.POST.getlist("sintoma_seleccionado")
+        sintomas_seleccionadas = request.session["sintomas_seleccionadas"]
+        sintomas_seleccionados = [
+            s for s in sintomas_seleccionados if s not in sintomas_seleccionadas]
+        request.session["sintomas_seleccionadas"] += sintomas_seleccionados
+        context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
+        context["sintomas"] = sintomas
+        # Aquí puedes procesar los síntomas seleccionados según tus necesidades
+        return render(request, "consultas/motivo_consulta.html", context)
+        # return render(request, "consultas/motivo_consulta.html", context)
+    return HttpResponse("Método no permitido.", status=405)
+
+
+def vaciar_sintomas_seleccionados(request):
+    request.session["sintomas_seleccionadas"] = []
+    return redirect('motivo_consulta')
+
+
+def motivo_consulta(request):
+    context = {}
+    if "sintomas" not in request.session:
+        request.session["sintomas"] = ['fatiga', 'dolor de cabeza', 'mareos',
+                'apnea del sueño', 'falta de energia', 'presion arterial alta']
+    context["sintomas"] = request.session["sintomas"]
+    if request.method == "POST":
+        # Aquí puedes procesar los datos del motivo de consulta según tus necesidades
+        motivo = request.POST.get('motivo', '').strip()
+        observaciones = request.POST.get('observaciones', '')
+        sintomas_observados = request.session.get("sintomas_seleccionadas", [])
+        # return HttpResponse(f"Motivo: {motivo}, Observaciones: {observaciones}, Síntomas: {', '.join(sintomas_observados)}")
+        return HttpResponse("motivo de consulta guardados correctamente.")
+
+    return render(request, "consultas/motivo_consulta.html", context)
