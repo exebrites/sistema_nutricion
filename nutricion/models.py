@@ -99,21 +99,21 @@ class Antropometria(models.Model):
     imc = models.FloatField(
         help_text='Índice de Masa Corporal', blank=True, null=True)
     perimetro_abdominal = models.FloatField(
-        help_text='Perímetro abdominal en cm')
+        help_text='Perímetro abdominal en cm', null=True, blank=True)
     circunferencia_abdominal = models.FloatField(
-        help_text='Circunferencia abdominal en cm')
+        help_text='Circunferencia abdominal en cm', null=True, blank=True)
     pliegue_cutaneo_tricipital = models.FloatField(
-        help_text='Pliegue cutánea triicipital en mm')
+        help_text='Pliegue cutáneo triicipital en mm', null=True, blank=True)
     pliegue_cutaneo_subescapular = models.FloatField(
-        help_text='Pliegue cutánea subescapular en mm')
+        help_text='Pliegue cutáneo subescapular en mm', null=True, blank=True)
     pliegue_cutaneo_bicipital = models.FloatField(
-        help_text='Pliegue cutánea bicipital en mm')
+        help_text='Pliegue cutáneo bicipital en mm', null=True, blank=True)
     pliegue_cutaneo_suprailiaco = models.FloatField(
-        help_text='Pliegue cutánea suprailiaco en mm')
+        help_text='Pliegue cutáneo suprailiaco en mm', null=True, blank=True)
     circunferencia_cadera = models.FloatField(
-        help_text='Circunferencia de la cadera en cm')
+        help_text='Circunferencia de la cadera en cm', null=True, blank=True)
     perimetro_cefalico = models.FloatField(
-        help_text='Perímetro cefálico en cm')
+        help_text='Perímetro cefálico en cm', null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.altura > 0:
