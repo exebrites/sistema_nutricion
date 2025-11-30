@@ -4,13 +4,13 @@ from pyexpat.errors import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-
-from experto.main import evaluar_nutricion
 from .models import Alimento, Antropometria, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta, HabitoAlimentario
 from .forms import AlimentoForm
-
-
 from django.core.paginator import Paginator
+# sistema experto
+from experto.main import evaluar_nutricion, DiagnosticoPES
+ 
+
 # home
 
 
@@ -466,9 +466,19 @@ def informacion_general(request):
     antropometria = Antropometria.objects.filter(
         paciente=paciente).last()
     dieta = Dieta.objects.filter(paciente=paciente).last()
+    # clasificar el imc sistema experto
+  
+    resultado, regla_activada = DiagnosticoPES.clasificar_imc(antropometria.imc)
+    diagnostico_problema = {
+        'explicacion': f"El paciente tiene un IMC de {antropometria.imc:.2f}, lo que lo clasifica como '{resultado}'.",
+        'clasificacion': resultado,
+        'regla_activada': regla_activada
+    }
+    
     context = {"paciente": paciente,
                "motivo_consulta": motivo_consulta,
                "antropometria": antropometria,
                "dieta": dieta,
+               "diagnostico_problema": diagnostico_problema,
                }
     return render(request, "consultas/informacion_general.html", context)

@@ -1,4 +1,4 @@
-from experta import Fact
+from experta import Fact, Field
 
 class Nutricion(Fact):
     """
@@ -11,4 +11,9 @@ class Validacion(Fact):
     Datos para validar la integridad del alimento 
     (stock, nombre, fecha, etc.)
     """
+    pass
+
+class Paciente(Fact):
+    """Hecho que contiene datos antropométricos simples del paciente adulto."""
+    imc = Field(float, mandatory=True)
     pass
