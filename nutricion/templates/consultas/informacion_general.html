@@ -1,116 +1,116 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Informaci n general</h1>
-    <h2>Datos del paciente</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Edad</th>
-                <th>Sexo</th>
-                <th>Direcci n</th>
-                <th>N mero de tel fono</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ paciente.nombre }}</td>
-                <td>{{ paciente.apellido }}</td>
-                <td>{{ paciente.edad }}</td>
-                <td>{{ paciente.sexo }}</td>
-                <td>{{ paciente.direccion_residencial }}</td>
-                <td>{{ paciente.numero_telefono }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <h2>Alimentos y habitos alimenticios</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripci n</th>
-                <th>Alimentos</th>
-                <th>Fecha de creaci n</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for d in paciente.dietas.all %}
-            <tr>
-                <td>{{ d.nombre }}</td>
-                <td>{{ d.descripcion }}</td>
-                <td>
-                    {% for da in d.alimentos.all %}
-                    {{ da.nombre }} ({{ da.cantidad }} {{ da.unidad }})
-                    {% if not forloop.last %}
-                    ,
-                    {% endif %}
-                    {% endfor %}
-                </td>
-                <td>{{ d.creada|date:"d/m/Y" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h2>Motivos de consulta</h2>
-    
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Paciente</th>
-                <th>Fecha de consulta</th>
-                <th>Motivo</th>
-                <th>Observaciones</th>
-                 
-                <th>S ntomas</th>
-            </tr>
-        </thead>
-        <tbody>
-           
-            <tr>
-                <td>{{  paciente.nombre }} {{  paciente.apellido }}</td>
-                <td>{{ motivo_consulta.fecha_consulta|date:"d/m/Y" }}</td>
-                <td>{{ motivo_consulta.motivo }}</td>
-                <td>{{ motivo_consulta.observaciones }}</td>
- 
-                <td>
-                    {% for s in motivo_consulta.sintomas.all %}
-                    {{ s.nombre }}
-                    {% if not forloop.last %}
-                    ,
-                    {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-            
-        </tbody>
-    </table>
-    <h2>antropometria</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                 
-                <th>Fecha de medici n</th>
-                <th>Peso corporal (kg)</th>
-                <th>Altura (cm)</th>
-                <th>IMC</th>
-                <th>Perímetro abdominal (cm)</th>
-                 
-            </tr>
-        </thead>
-        <tbody>
-           
-            <tr>
-                 
-                <td>{{ antropometria.fecha_medicion|date:"d/m/Y" }}</td>
-                <td>{{ antropometria.peso_corporal }}</td>
-                <td>{{ antropometria.altura }}</td>
-                <td>{{ '%.2f' % antropometria.imc }}</td>
-                <td>{{ antropometria.perimetro_abdominal }}</td>
-                
-            </tr>
-            
-        </tbody>
-    </table>
+<h1>Informaci n general</h1>
+<h2>Datos del paciente</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Edad</th>
+            <th>Sexo</th>
+            <th>Direcci n</th>
+            <th>N mero de tel fono</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ paciente.nombre }}</td>
+            <td>{{ paciente.apellido }}</td>
+            <td>{{ paciente.edad }}</td>
+            <td>{{ paciente.sexo }}</td>
+            <td>{{ paciente.direccion_residencial }}</td>
+            <td>{{ paciente.numero_telefono }}</td>
+        </tr>
+    </tbody>
+</table>
+<h2>Alimentos y habitos alimenticios</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripci n</th>
+            <th>Alimentos</th>
+            <th>Fecha de creaci n</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in paciente.dietas.all %}
+        <tr>
+            <td>{{ d.nombre }}</td>
+            <td>{{ d.descripcion }}</td>
+            <td>
+                {% for da in d.alimentos.all %}
+                {{ da.nombre }} ({{ da.cantidad }} {{ da.unidad }})
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ d.creada|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2>Motivos de consulta</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Paciente</th>
+            <th>Fecha de consulta</th>
+            <th>Motivo</th>
+            <th>Observaciones</th>
+
+            <th>S ntomas</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr>
+            <td>{{ paciente.nombre }} {{ paciente.apellido }}</td>
+            <td>{{ motivo_consulta.fecha_consulta|date:"d/m/Y" }}</td>
+            <td>{{ motivo_consulta.motivo }}</td>
+            <td>{{ motivo_consulta.observaciones }}</td>
+
+            <td>
+                {% for s in motivo_consulta.sintomas.all %}
+                {{ s.nombre }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+<h2>antropometria</h2>
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>Fecha de medici n</th>
+            <th>Peso corporal (kg)</th>
+            <th>Altura (cm)</th>
+            <th>IMC</th>
+            <th>Perímetro abdominal (cm)</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr>
+
+            <td>{{ antropometria.fecha_medicion|date:"d/m/Y" }}</td>
+            <td>{{ antropometria.peso_corporal }}</td>
+            <td>{{ antropometria.altura }}</td>
+            <td>{{ antropometria.imc|floatformat:2 }}</td>
+            <td>{{ antropometria.perimetro_abdominal }}</td>
+
+        </tr>
+
+    </tbody>
+</table>
 {% endblock %}
