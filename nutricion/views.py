@@ -1,3 +1,4 @@
+import datetime
 import json
 from pyexpat.errors import messages
 from django.http import HttpResponse
@@ -5,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from experto.main import evaluar_nutricion
-from .models import Alimento, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta,HabitoAlimentario
+from .models import Alimento, Antropometria, Dieta, DietaAlimento, Paciente, Sintoma, MotivoConsulta, HabitoAlimentario
 from .forms import AlimentoForm
 
 
@@ -219,15 +220,17 @@ def crear_paciente(request):
         fecha_nacimiento = request.POST.get("fecha_nacimiento")
         direccion_residencial = request.POST.get("direccion_residencial")
         numero_telefono = request.POST.get("numero_telefono")
-        
+
         # 1. Aquí puedes guardar los datos del paciente en la base de datos
         # 2. Controlar que el nombre y apellido no existan en la base de datos
-        paciente_existe = Paciente.objects.filter(nombre=nombre, apellido=apellido).first()
+        paciente_existe = Paciente.objects.filter(
+            nombre=nombre, apellido=apellido).first()
         if paciente_existe:
-            context["error"] = "El paciente con nombre {} y apellido {} ya existe en la base de datos.".format(nombre, apellido)
+            context["error"] = "El paciente con nombre {} y apellido {} ya existe en la base de datos.".format(
+                nombre, apellido)
             return render(request, "consultas/primera_consulta.html", context)
         try:
-            paciente  = Paciente.objects.create(
+            paciente = Paciente.objects.create(
                 nombre=nombre,
                 apellido=apellido,
                 sexo=sexo,
@@ -240,8 +243,7 @@ def crear_paciente(request):
             request.session["paciente_id"] = paciente.id
         except Exception as e:
             return HttpResponse(f"Error al crear paciente: {e}", status=500)
-        
-        
+
         return redirect('motivo_consulta')
 
     return HttpResponse("Método no permitido.", status=405)
@@ -255,12 +257,13 @@ def agregar_sintoma_motivo_consulta(request):
         request.session["sintomas_seleccionadas"] = []
     if request.method == "POST":
         id_sintoma_seleccionado = request.POST.getlist("sintoma_seleccionado")
-        sintoma_seleccionado = Sintoma.objects.filter(id__in=id_sintoma_seleccionado)
+        sintoma_seleccionado = Sintoma.objects.filter(
+            id__in=id_sintoma_seleccionado)
         # agregar el sintoma seleccionado a la sesion y verifica duplicados
         # Obtener lista actual de la sesión
         sintomas_sesion = request.session["sintomas_seleccionadas"]
         ids_existentes = [s['id'] for s in sintomas_sesion]
-        
+
         # Agregar solo los síntomas que no están duplicados
         for sintoma in sintoma_seleccionado:
             if sintoma.id not in ids_existentes:
@@ -270,7 +273,7 @@ def agregar_sintoma_motivo_consulta(request):
                 })
         request.session["sintomas_seleccionadas"] = sintomas_sesion
 
-        #datos al template
+        # datos al template
         context["sintomas_seleccionadas"] = sintomas_sesion
         context["sintomas"] = sintomas
         # Aquí puedes procesar los síntomas seleccionados según tus necesidades
@@ -282,22 +285,22 @@ def agregar_sintoma_motivo_consulta(request):
 def vaciar_sintomas_seleccionados(request):
     request.session["sintomas_seleccionadas"] = []
     return redirect('motivo_consulta')
- 
+
 
 def motivo_consulta(request):
     # return HttpResponse("sintomas...")
     context = {}
-    context={'success': request.session['success']}
-    #1. eliminar el mensaje de exito de la sesion
+    context = {'success': request.session['success']}
+    # 1. eliminar el mensaje de exito de la sesion
     sintomas = Sintoma.objects.all()
     context["sintomas"] = sintomas
-    #obtener sintomas seleccionados de la sesion
+    # obtener sintomas seleccionados de la sesion
     if "sintomas_seleccionadas" not in request.session:
         request.session["sintomas_seleccionadas"] = []
     context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
 
-    #obtener pacientes y pasar 
-    pacientes= Paciente.objects.all()
+    # obtener pacientes y pasar
+    pacientes = Paciente.objects.all()
     context["pacientes"] = pacientes
 
     # obtener paciente creado recientemente
@@ -310,14 +313,14 @@ def motivo_consulta(request):
 
     if request.method == "POST":
         # Aquí puedes procesar los datos del motivo de consulta según tus necesidades
-    
+
         motivo = request.POST.get('motivo', '').strip()
         observaciones = request.POST.get('observaciones', '')
         sintomas_observados = request.session.get("sintomas_seleccionadas", [])
         paciente_id = request.POST.get('paciente', '')
         paciente = get_object_or_404(Paciente, id=paciente_id)
         # Guardar el motivo de consulta y los síntomas en la base de datos
-        
+
         try:
             motivo_consulta = MotivoConsulta.objects.create(
                 paciente=paciente,
@@ -332,11 +335,9 @@ def motivo_consulta(request):
             request.session["sintomas_seleccionadas"] = []
             request.session["paciente_id"] = paciente.id
         except Exception as e:
-            
+
             return HttpResponse(f"Error al guardar el motivo de consulta: {e}", status=500)
-    
-        
-    
+
         return redirect('alimentos_habitos')
 
     return render(request, "consultas/motivo_consulta.html", context)
@@ -344,31 +345,30 @@ def motivo_consulta(request):
 
 def alimentos_habitos(request):
     context = {}
-    #obtener alimento y enviarlos al templte
+    # obtener alimento y enviarlos al templte
     alimentos = Alimento.objects.all()
     context["alimentos"] = alimentos
-    #obtener alimentos seleccionados de la sesion
+    # obtener alimentos seleccionados de la sesion
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
     context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
-    ## obtener habitos alimentarios y enviarlos al template
+    # obtener habitos alimentarios y enviarlos al template
     habitos_alimentarios = HabitoAlimentario.objects.all()
     context["habitos_alimentarios"] = habitos_alimentarios
-    #obtener el paciente 
+    # obtener el paciente
     paciente_id = request.session.get("paciente_id")
     if paciente_id:
         paciente = get_object_or_404(Paciente, id=paciente_id)
         context["paciente"] = paciente
 
-    
-
     if request.method == "POST":
         # Aquí puedes procesar los datos de alimentos y hábitos según tus necesidades
         habito_alimenticio = request.POST.get('habitos', '').strip()
-        lista_alimentos = request.session.get("lista_alimentos_seleccionados", [])
+        lista_alimentos = request.session.get(
+            "lista_alimentos_seleccionados", [])
         paciente_id = request.POST.get('paciente_id', '')
         paciente = get_object_or_404(Paciente, id=paciente_id)
-        
+
         # Guardar los hábitos alimentarios y los alimentos en la base de datos
         try:
             # Aquí puedes guardar los datos en la base de datos según tu modelo
@@ -388,11 +388,9 @@ def alimentos_habitos(request):
         except Exception as e:
             return HttpResponse(f"Error al guardar los datos: {e}", status=500)
 
-
-
         # return HttpResponse("Datos de alimentos y hábitos recibidos.")
         return redirect('crear_atropometria')
-    return render(request, "consultas/alimentos_habitos.html",context)
+    return render(request, "consultas/alimentos_habitos.html", context)
 
 
 def agregar_alimento(request):
@@ -419,9 +417,11 @@ def agregar_alimento(request):
 
     return HttpResponse("Método no permitido.", status=405)
 
+
 def vaciar_lista_alimentos_seleccionados(request):
     request.session["lista_alimentos_seleccionados"] = []
     return redirect('alimentos_habitos')
+
 
 def crear_atropometria(request):
     context = {}
@@ -429,6 +429,8 @@ def crear_atropometria(request):
         peso = request.POST.get("peso")
         altura = request.POST.get("altura")
         circunferencia_abdominal = request.POST.get("circunferencia_abdominal")
+        paciente_id = request.session.get("paciente_id")
+        paciente = get_object_or_404(Paciente, id=paciente_id)
         imc = None
         if peso and altura:
             try:
@@ -438,9 +440,35 @@ def crear_atropometria(request):
             except ValueError:
                 imc = "Valores inválidos"
         context["imc"] = imc
-        # return HttpResponse(f"Peso: {peso} kg, Altura: {altura} cm, IMC: {imc}, Circunferencia Abdominal: {circunferencia_abdominal} cm")
+        try:
+            antropometria = Antropometria.objects.create(
+                paciente=paciente,
+                fecha_medicion=datetime.date.today(),
+                peso_corporal=peso,
+                altura=altura,
+                imc=imc,
+                perimetro_abdominal=float(
+                    circunferencia_abdominal) if circunferencia_abdominal else None,
+            )
+        except Exception as e:
+            return HttpResponse(f"Error al crear la antropometría: {e}", status=500)
+
         return redirect('informacion_general')
-    return render(request, "consultas/antropometria.html",context)
+    return render(request, "consultas/antropometria.html", context)
+
 
 def informacion_general(request):
-    return render(request, "consultas/informacion_general.html")
+    context = {}
+    paciente_id = request.session.get("paciente_id")
+    paciente = Paciente.objects.get(id=paciente_id)
+    motivo_consulta = MotivoConsulta.objects.filter(
+        paciente=paciente).last()
+    antropometria = Antropometria.objects.filter(
+        paciente=paciente).last()
+    dieta = Dieta.objects.filter(paciente=paciente).last()
+    context = {"paciente": paciente,
+               "motivo_consulta": motivo_consulta,
+               "antropometria": antropometria,
+               "dieta": dieta,
+               }
+    return render(request, "consultas/informacion_general.html", context)

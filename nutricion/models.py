@@ -115,11 +115,7 @@ class Antropometria(models.Model):
     perimetro_cefalico = models.FloatField(
         help_text='Perímetro cefálico en cm', null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.altura > 0:
-            altura_metros = self.altura / 100
-            self.imc = self.peso / (altura_metros ** 2)
-        super().save(*args, **kwargs)
+    
 
     def __str__(self):
         return f"Antropometría de {self.paciente.nombre} el {self.fecha_medicion}"
