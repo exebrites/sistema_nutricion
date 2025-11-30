@@ -8,8 +8,8 @@ from .models import Alimento, Antropometria, Dieta, DietaAlimento, Paciente, Sin
 from .forms import AlimentoForm
 from django.core.paginator import Paginator
 # sistema experto
-from experto.main import evaluar_nutricion
-from .sistema_clasificacion_sobrepeso_obsesidad import clasificar_imc
+from experto.main import evaluar_nutricion, DiagnosticoPES
+ 
 
 # home
 
@@ -467,13 +467,14 @@ def informacion_general(request):
         paciente=paciente).last()
     dieta = Dieta.objects.filter(paciente=paciente).last()
     # clasificar el imc sistema experto
-    resultado, regla_activada = clasificar_imc(antropometria.imc)
+  
+    resultado, regla_activada = DiagnosticoPES.clasificar_imc(antropometria.imc)
     diagnostico_problema = {
         'explicacion': f"El paciente tiene un IMC de {antropometria.imc:.2f}, lo que lo clasifica como '{resultado}'.",
         'clasificacion': resultado,
         'regla_activada': regla_activada
     }
-
+    
     context = {"paciente": paciente,
                "motivo_consulta": motivo_consulta,
                "antropometria": antropometria,

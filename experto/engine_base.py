@@ -17,6 +17,12 @@ class MotorBase(KnowledgeEngine):
         # --- Listas de Validación (NUEVAS) ---
         self.errores = []
         self.info = []
+        #-- sobrepeso/obesidad   
+        self.resultado = None
+        self.triggered_rule = None # New attribute to store the triggered rule details
+
+    # Métodos para agregar resultados
+
 
     def agregar_riesgo(self, mensaje):
         self.riesgos.append(mensaje)
@@ -38,6 +44,13 @@ class MotorBase(KnowledgeEngine):
 
     def agregar_info(self, mensaje):
         self.info.append(mensaje)
+
+    #sobrepeso/obesidad
+    def set_resultado(self, resultado):
+        self.resultado = resultado
+
+    def set_triggered_rule(self, triggered_rule):
+        self.triggered_rule = triggered_rule
 
     def obtener_reporte_validacion(self):
         """Retorna solo lo relevante para validación"""

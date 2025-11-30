@@ -1,5 +1,5 @@
-from .facts import Nutricion
-from .rules import BaseConocimientoNutricional
+from .facts import Nutricion, Paciente
+from .rules import BaseConocimientoNutricional, ClasificacionIMC
 
 def evaluar_nutricion(data,modo="completo"):
     if modo not in ["validacion","nutricion"]:
@@ -20,20 +20,12 @@ def evaluar_nutricion(data,modo="completo"):
     # 4. Extracción de resultados (usando el método del padre)
     
 
-# --- PRUEBA ---
-# if __name__ == "__main__":
-#     datos_alimento = {
-#         "calorias": 120,
-#         "grasas": 5,
-#         "grasas_saturadas": 2,
-#         "sodio": 150,
-#         "azucar": 10,
-#         "carbohidratos": 30,
-#         "proteinas": 20,
-#         "fibra": 6,
-#         "vitaminas": True
-#     }
-
-#     resultado = evaluar_nutricion(datos_alimento)
-#     import json
-#     print(json.dumps(resultado, indent=4, ensure_ascii=False))
+class DiagnosticoPES:
+    """Clase para manejar diagnósticos de sobrepeso y obesidad basados en IMC."""
+    
+    def clasificar_imc(imc_valor):
+        engine = ClasificacionIMC()
+        engine.reset()
+        engine.declare(Paciente(imc=imc_valor))
+        engine.run()
+        return engine.resultado, engine.triggered_rule # Return both results and triggered rule

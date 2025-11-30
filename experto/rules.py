@@ -1,7 +1,8 @@
 from datetime import datetime
-from experta import Rule, P,OR, AS
-from .facts import Nutricion, Validacion  # Importamos Validacion
+from experta import Rule, P, OR, AS, DefFacts, Fact
+from .facts import Nutricion, Validacion, Paciente  # Importamos Validacion
 from .engine_base import MotorBase
+
 
 class BaseConocimientoNutricional(MotorBase):
     """
@@ -120,3 +121,67 @@ class ReglasValidacion(MotorBase):
     @Rule(Validacion(calorias=P(lambda c: c >= 250)))
     def alto_calorias(self):
         self.agregar_info("Producto alto en calorías.")
+# -------------------------------
+# SISTEMA EXPERTO - CLASIFICACIÓN IMC ADULTOS
+# -------------------------------
+
+
+class ClasificacionIMC(MotorBase):
+
+    """
+    Motor experto para clasificar el IMC en adultos.
+    Utiliza reglas basadas en rangos de IMC para determinar la categoría.
+    """
+    @DefFacts()
+    def _initial_action(self):
+        yield Fact(start=True)
+
+    # Normal
+    @Rule(Paciente(imc=P(lambda x: x < 25)))
+    def normal(self):
+        self.set_resultado("IMC Normal (<25)")
+        self.set_triggered_rule({
+            "rule_name": "normal",
+            "classification": self.resultado,
+            "condition": "imc < 25"
+        })
+
+    # Sobrepeso
+    @Rule(Paciente(imc=P(lambda x: 25 <= x < 30)))
+    def sobrepeso(self):
+        self.set_resultado("Sobrepeso (25–29.9)")
+        self.set_triggered_rule({
+            "rule_name": "sobrepeso",
+            "classification": self.resultado,
+            "condition": "25 <= imc < 30"
+        })
+
+    # Obesidad grado I
+    @Rule(Paciente(imc=P(lambda x: 30 <= x < 35)))
+    def obesidad_I(self):
+        self.set_resultado("Obesidad grado I (30–34.9)")
+        self.set_triggered_rule({
+            "rule_name": "obesidad_I",
+            "classification": self.resultado,
+            "condition": "30 <= imc < 35"
+        })
+
+    # Obesidad grado II
+    @Rule(Paciente(imc=P(lambda x: 35 <= x < 40)))
+    def obesidad_II(self):
+        self.set_resultado("Obesidad grado II (35–39.9)")
+        self.set_triggered_rule({
+            "rule_name": "obesidad_II",
+            "classification": self.resultado,
+            "condition": "35 <= imc < 40"
+        })
+
+    # Obesidad grado III
+    @Rule(Paciente(imc=P(lambda x: x >= 40)))
+    def obesidad_III(self):
+        self.set_resultado("Obesidad grado III (≥40)")
+        self.set_triggered_rule({
+            "rule_name": "obesidad_III",
+            "classification": self.resultado,
+            "condition": "imc >= 40"
+        })
