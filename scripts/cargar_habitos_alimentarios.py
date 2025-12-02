@@ -66,11 +66,11 @@ def cargar_habitos_alimentarios():
                 descripcion=dato['descripcion']
             )
             habitos_creados.append(habito)
-            print(f"✅ Hábito creado: {habito.nombre}")
+            print(f"[OK] Habito creado: {habito.nombre}")
         else:
-            print(f"⚠️  Hábito ya existe: {dato['nombre']}")
+            print(f"[WARN] Habito ya existe: {dato['nombre']}")
     
-    print(f"\n🎉 Se crearon {len(habitos_creados)} hábitos alimentarios nuevos")
+    print(f"\n[SUCCESS] Se crearon {len(habitos_creados)} habitos nuevos")
     return habitos_creados
 
 if __name__ == '__main__':

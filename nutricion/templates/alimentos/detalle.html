@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_alimentos' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar alimentos" subtitle="Detalles del alimento" back_url=url_volver %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>{{ alimento.nombre }}</h3>
+                </div>
+                <div class="card-body">
+                    <h5>Información Nutricional:</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Calorías:</strong> {{ alimento.calorias }}</li>
+                        <li class="list-group-item"><strong>Proteínas:</strong> {{ alimento.proteinas }}g</li>
+                        <li class="list-group-item"><strong>Grasas:</strong> {{ alimento.grasas }}g</li>
+                        <li class="list-group-item"><strong>Carbohidratos:</strong> {{ alimento.carbohidratos }}g</li>
+                        <li class="list-group-item"><strong>Sodio:</strong> {{ alimento.sodio }}mg</li>
+                        <li class="list-group-item"><strong>Fibra:</strong> {{ alimento.fibra_alimentaria }}g</li>
+                        <li class="list-group-item"><strong>Azúcares:</strong> {{ alimento.azucares_totales }}g</li>
+                        <li class="list-group-item"><strong>Agua/Humedad:</strong> {{ alimento.agua_humedad }}g</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Información de Inventario:</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Stock:</strong> {{ alimento.stock }}</li>
+                        <li class="list-group-item"><strong>Fecha de vencimiento:</strong> {{ alimento.fecha_vencimiento }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if evaluacion %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>Evaluación del Sistema Experto:</h5>
+                </div>
+                <div class="card-body">
+                    {% if evaluacion.clasificacion %}
+                    <div class="alert alert-info">
+                        <strong>Clasificación:</strong> {{ evaluacion.clasificacion }}
+                    </div>
+                    {% endif %}
+
+                    {% if evaluacion.riesgos %}
+                    <div class="alert alert-danger">
+                        <strong>Riesgos detectados:</strong>
+                        <ul class="mb-0">
+                            {% for riesgo in evaluacion.riesgos %}
+                            <li>{{ riesgo }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if evaluacion.advertencias %}
+                    <div class="alert alert-warning">
+                        <strong>Advertencias:</strong>
+                        <ul class="mb-0">
+                            {% for advertencia in evaluacion.advertencias %}
+                            <li>{{ advertencia }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if evaluacion.beneficios %}
+                    <div class="alert alert-success">
+                        <strong>Beneficios:</strong>
+                        <ul class="mb-0">
+                            {% for beneficio in evaluacion.beneficios %}
+                            <li>{{ beneficio }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'editar_alimento' alimento.id %}" class="btn btn-warning">Editar</a>
+                <a href="{% url 'eliminar_alimento' alimento.id %}" class="btn btn-danger">Eliminar</a>
+                <a href="{% url 'lista_alimentos' %}" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

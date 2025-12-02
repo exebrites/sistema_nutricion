@@ -2,9 +2,11 @@
 import os
 import django
 import random
+import sys
 from datetime import date, timedelta
 
 # Configurar Django
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sistema_nutricion.settings')
 django.setup()
 

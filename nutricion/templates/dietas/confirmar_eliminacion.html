@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_dietas' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar dietas" subtitle="Confirmar eliminación" back_url=url_volver %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">¡Advertencia!</h4>
+                <p>Está a punto de eliminar la dieta: <strong>{{ dieta.nombre }}</strong></p>
+                <hr>
+                <p class="mb-0">Esta acción eliminará la dieta y todos sus alimentos asociados. ¿Está seguro de que desea continuar?</p>
+            </div>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+                <a href="{% url 'lista_dietas' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+
+            <div class="mt-4">
+                <h5>Detalles de la dieta:</h5>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Nombre:</strong> {{ dieta.nombre }}</li>
+                    <li class="list-group-item"><strong>Descripción:</strong> {{ dieta.descripcion|default:"Sin descripción" }}</li>
+                    <li class="list-group-item"><strong>Fecha de creación:</strong> {{ dieta.creada }}</li>
+                    <li class="list-group-item"><strong>Cantidad de alimentos:</strong> {{ dieta.alimentos.count }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -22,6 +22,12 @@ class BaseConocimientoNutricional(MotorBase):
     @Rule(Nutricion(azucar=P(lambda a: a > 20)))
     def riesgo_azucar(self):
         self.agregar_riesgo("Exceso de azúcar: evitar en diabéticos.")
+    # ---------------- Riesgo por muy poco valor nutricional-belen--------------- #
+    @Rule(Nutricion(proteinas=P(lambda p: p < 2),
+                    fibra=P(lambda f: f < 1),
+                    vitaminas=False))
+    def bajo_valor_nutricional(self):
+        self.agregar_riesgo("Bajo valor nutricional: evitar consumo frecuente.")
 
     # ---------------- ADVERTENCIAS ---------------- #
     @Rule(Nutricion(calorias=P(lambda c: c >= 300)))
@@ -65,6 +71,12 @@ class BaseConocimientoNutricional(MotorBase):
     ))
     def clasificacion_no_saludable(self):
         self.set_clasificacion("Poco saludable")
+      # Ultraprocesado-belen
+    @Rule(Nutricion(sodio=P(lambda s: s > 600),
+                    grasas_saturadas=P(lambda g: g > 15),
+                    azucar=P(lambda a: a > 25)))
+    def clasificacion_ultraprocesado(self):
+        self.set_clasificacion("Ultraprocesado: consumir muy ocasionalmente.")
 
     # Regla por defecto (baja prioridad o catch-all)
     @Rule(AS.f << Nutricion())
@@ -136,14 +148,24 @@ class ClasificacionIMC(MotorBase):
     def _initial_action(self):
         yield Fact(start=True)
 
-    # Normal
-    @Rule(Paciente(imc=P(lambda x: x < 25)))
+    # Bajo peso belen (salience=10 para ejecutar antes que normal)
+    @Rule(Paciente(imc=P(lambda x: x < 18.5)), salience=10)
+    def bajo_peso(self):
+        self.set_resultado("Bajo peso (<18.5)")
+        self.set_triggered_rule({
+            "rule_name": "bajo_peso",
+            "classification": self.resultado,
+            "condition": "imc < 18.5"
+        })
+
+    # Normal (excluyendo bajo peso y sobrepeso/obesidad)
+    @Rule(Paciente(imc=P(lambda x: 18.5 <= x < 25)))
     def normal(self):
-        self.set_resultado("IMC Normal (<25)")
+        self.set_resultado("IMC Normal (18.5–24.9)")
         self.set_triggered_rule({
             "rule_name": "normal",
             "classification": self.resultado,
-            "condition": "imc < 25"
+            "condition": "18.5 <= imc < 25"
         })
 
     # Sobrepeso

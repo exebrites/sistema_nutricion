@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_dietas' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar dietas" subtitle="Editar dieta" back_url=url_volver %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Información de la dieta</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="nombre" class="form-label">Nombre de la dieta:</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ dieta.nombre }}" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="descripcion" class="form-label">Descripción:</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4">{{ dieta.descripcion }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Actualizar dieta</button>
+                        <a href="{% url 'lista_dietas' %}" class="btn btn-secondary">Cancelar</a>
+                    </form>
+
+                    {% if success %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        {{ success }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>Alimentos en esta dieta ({{ alimentos_dieta.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if alimentos_dieta %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Alimento</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Calorías</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for da in alimentos_dieta %}
+                            <tr>
+                                <td>{{ da.alimento.nombre }}</td>
+                                <td>{{ da.cantidad }}</td>
+                                <td>{{ da.unidad }}</td>
+                                <td>{{ da.alimento.calorias }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">Esta dieta aún no tiene alimentos asignados.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'eliminar_dieta' dieta.id %}" class="btn btn-danger">Eliminar dieta</a>
+                <a href="{% url 'lista_dietas' %}" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

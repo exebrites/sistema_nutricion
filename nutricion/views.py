@@ -58,15 +58,57 @@ def lista_alimentos(request):
 
 
 def editar_alimento(request, alimento_id):
-    return HttpResponse("Editar alimento %s" % alimento_id)
+    alimento = get_object_or_404(Alimento, id=alimento_id)
+    
+    if request.method == "POST":
+        form = AlimentoForm(request.POST, instance=alimento)
+        if form.is_valid():
+            alimento = form.save()
+            return render(request, "alimentos/editar.html", {
+                "form": AlimentoForm(instance=alimento),
+                "success": "Alimento actualizado correctamente.",
+                "advertencias": form.advertencias,
+                "info": form.info,
+                "alimento": alimento
+            })
+    else:
+        form = AlimentoForm(instance=alimento)
+    
+    return render(request, "alimentos/editar.html", {
+        "form": form,
+        "alimento": alimento
+    })
 
 
 def eliminar_alimento(request, alimento_id):
-    return HttpResponse("Eliminar alimento %s" % alimento_id)
+    alimento = get_object_or_404(Alimento, id=alimento_id)
+    
+    if request.method == "POST":
+        alimento.delete()
+        return redirect('lista_alimentos')
+    
+    return render(request, "alimentos/confirmar_eliminacion.html", {
+        "alimento": alimento
+    })
 
 
 def alimento_detail(request, alimento_id):
-    return HttpResponse("Detalle del alimento %s" % alimento_id)
+    alimento = get_object_or_404(Alimento, id=alimento_id)
+    
+    # Evaluar el alimento con el motor experto
+    data = {
+        "calorias": alimento.calorias,
+        "proteinas": alimento.proteinas,
+        "grasas": alimento.grasas,
+        "carbohidratos": alimento.carbohidratos,
+        "sodio": alimento.sodio,
+    }
+    evaluacion = evaluar_nutricion(data, modo="nutricion")
+    
+    return render(request, "alimentos/detalle.html", {
+        "alimento": alimento,
+        "evaluacion": evaluacion
+    })
 
 # crud dieta
 
@@ -90,11 +132,39 @@ def ver_dieta(request, dieta_id):
 
 
 def editar_dieta(request, dieta_id):
-    return HttpResponse("Editar dieta %s" % dieta_id)
+    dieta = get_object_or_404(Dieta, id=dieta_id)
+    alimentos_dieta = DietaAlimento.objects.filter(dieta=dieta)
+    
+    if request.method == "POST":
+        nombre = request.POST.get("nombre", dieta.nombre)
+        descripcion = request.POST.get("descripcion", dieta.descripcion)
+        
+        dieta.nombre = nombre
+        dieta.descripcion = descripcion
+        dieta.save()
+        
+        return render(request, "dietas/editar.html", {
+            "dieta": dieta,
+            "alimentos_dieta": alimentos_dieta,
+            "success": "Dieta actualizada correctamente."
+        })
+    
+    return render(request, "dietas/editar.html", {
+        "dieta": dieta,
+        "alimentos_dieta": alimentos_dieta
+    })
 
 
 def eliminar_dieta(request, dieta_id):
-    return HttpResponse("Eliminar dieta %s" % dieta_id)
+    dieta = get_object_or_404(Dieta, id=dieta_id)
+    
+    if request.method == "POST":
+        dieta.delete()
+        return redirect('lista_dietas')
+    
+    return render(request, "dietas/confirmar_eliminacion.html", {
+        "dieta": dieta
+    })
 
 
 def crear_dieta(request):
@@ -255,7 +325,14 @@ def agregar_sintoma_motivo_consulta(request):
     context = {}
     if "sintomas_seleccionadas" not in request.session:
         request.session["sintomas_seleccionadas"] = []
-    if request.method == "POST":
+    
+    if request.method == "GET":
+        # GET: renderizar opciones de síntomas
+        context["sintomas"] = sintomas
+        context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
+        return render(request, "consultas/agregar_sintoma.html", context)
+    
+    elif request.method == "POST":
         id_sintoma_seleccionado = request.POST.getlist("sintoma_seleccionado")
         sintoma_seleccionado = Sintoma.objects.filter(
             id__in=id_sintoma_seleccionado)
@@ -279,6 +356,7 @@ def agregar_sintoma_motivo_consulta(request):
         # Aquí puedes procesar los síntomas seleccionados según tus necesidades
         return redirect('motivo_consulta')
         # return render(request, "consultas/motivo_consulta.html", context)
+    
     return HttpResponse("Método no permitido.", status=405)
 
 
@@ -395,7 +473,17 @@ def alimentos_habitos(request):
 
 def agregar_alimento(request):
     context = {}
-    if request.method == "POST":
+    if "lista_alimentos_seleccionados" not in request.session:
+        request.session["lista_alimentos_seleccionados"] = []
+    
+    if request.method == "GET":
+        # GET: renderizar opciones de alimentos
+        alimentos = Alimento.objects.all()
+        context["alimentos"] = alimentos
+        context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
+        return render(request, "consultas/agregar_alimento.html", context)
+    
+    elif request.method == "POST":
         alimento_seleccionado = request.POST.get("alimentos")
         if "lista_alimentos_seleccionados" not in request.session:
             request.session["lista_alimentos_seleccionados"] = []

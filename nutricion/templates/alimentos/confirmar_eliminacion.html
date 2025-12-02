@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_alimentos' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar alimentos" subtitle="Confirmar eliminación" back_url=url_volver %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">¡Advertencia!</h4>
+                <p>Está a punto de eliminar el alimento: <strong>{{ alimento.nombre }}</strong></p>
+                <hr>
+                <p class="mb-0">Esta acción no se puede deshacer. ¿Está seguro de que desea continuar?</p>
+            </div>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+                <a href="{% url 'lista_alimentos' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+
+            <div class="mt-4">
+                <h5>Detalles del alimento:</h5>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Nombre:</strong> {{ alimento.nombre }}</li>
+                    <li class="list-group-item"><strong>Calorías:</strong> {{ alimento.calorias }}</li>
+                    <li class="list-group-item"><strong>Proteínas:</strong> {{ alimento.proteinas }}g</li>
+                    <li class="list-group-item"><strong>Grasas:</strong> {{ alimento.grasas }}g</li>
+                    <li class="list-group-item"><strong>Carbohidratos:</strong> {{ alimento.carbohidratos }}g</li>
+                    <li class="list-group-item"><strong>Sodio:</strong> {{ alimento.sodio }}mg</li>
+                    <li class="list-group-item"><strong>Stock:</strong> {{ alimento.stock }}</li>
+                    <li class="list-group-item"><strong>Fecha de vencimiento:</strong> {{ alimento.fecha_vencimiento }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

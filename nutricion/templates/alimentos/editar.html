@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% url 'lista_alimentos' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar alimentos" subtitle="Editar alimento" back_url=url_volver %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="btn btn-success">Actualizar</button>
+                <a href="{% url 'lista_alimentos' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+
+            {% if success %}
+            <div class="alert alert-success mt-3" role="alert">
+                {{ success }}
+            </div>
+            {% endif %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger mt-3" role="alert">
+                <strong>Errores en el formulario:</strong>
+                <ul class="mb-0">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                    {% for field, errors in form.errors.items %}
+                        {% if field != '__all__' %}
+                        <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if advertencias %}
+            <div class="alert alert-warning mt-3" role="alert">
+                <strong>Advertencias del sistema experto:</strong>
+                <ul class="mb-0">
+                    {% for a in advertencias %}
+                    <li>{{ a }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if info %}
+            <div class="alert alert-info mt-3" role="alert">
+                <strong>Información nutricional:</strong>
+                <ul class="mb-0">
+                    {% for i in info %}
+                    <li>{{ i }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

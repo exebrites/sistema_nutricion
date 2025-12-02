@@ -40,11 +40,12 @@ class AlimentoForm(forms.ModelForm):
         }
 
         resultado = validar_alimento(data)
-        return resultado
+        
         # ERRORES → bloquean el guardado
-        for e in resultado["errores"]:
-            self.add_error(None, e)
-
+        if resultado["errores"]:
+            for e in resultado["errores"]:
+                self.add_error(None, e)
+        
         # Guardamos advertencias e info para mostrarlas en la vista
         self.advertencias = resultado["advertencias"]
         self.info = resultado["info"]

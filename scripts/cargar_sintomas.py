@@ -66,11 +66,11 @@ def cargar_sintomas():
                 descripcion=dato['descripcion']
             )
             sintomas_creados.append(sintoma)
-            print(f"✅ Síntoma creado: {sintoma.nombre}")
+            print(f"[OK] Sintoma creado: {sintoma.nombre}")
         else:
-            print(f"⚠️  Síntoma ya existe: {dato['nombre']}")
+            print(f"[WARN] Sintoma ya existe: {dato['nombre']}")
     
-    print(f"\n🎉 Se crearon {len(sintomas_creados)} síntomas nuevos")
+    print(f"\n[SUCCESS] Se crearon {len(sintomas_creados)} sintomas nuevos")
     return sintomas_creados
 
 if __name__ == '__main__':
