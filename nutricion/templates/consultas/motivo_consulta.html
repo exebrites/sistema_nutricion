@@ -14,12 +14,12 @@
     {{ success }}
 </div>
 {% endif %}
-<h1>Motivo de la consulta</h1>
-<p>Por favor, describe el motivo de tu consulta nutricional.</p>
+ 
 
-<h2>Síntomas</h2>
+
 <div class="row">
     <div class="col-sm-6">
+        <h2>Síntomas</h2>
         <form action="{% url 'agregar_sintoma_motivo_consulta' %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="sintomas" value="{{ sintomas|join:',' }}">
@@ -45,6 +45,7 @@
         </form>
     </div>
     <div class="col-sm-6">
+        <h2>Listado de sintomas</h2>
         {% if sintomas_seleccionadas %}
         <a href="{% url 'vaciar_sintomas_seleccionados' %}" class="btn btn-warning btn-sm"
             style="margin-bottom: 0px;margin-top: -6px;">Vaciar sintomas</a>
