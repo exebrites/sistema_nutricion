@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 
+
 {% block content %}
-    <h1>Datos de antropometria</h1>
+ 
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar consulta" subtitle="Datos de antropometria" back_url=url_volver %}
+
+     
     <form action="{% url 'crear_atropometria' %}" method="post">
 
         {% csrf_token %}

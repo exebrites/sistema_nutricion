@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar consulta" subtitle="Motivo de la consulta" back_url=url_volver %}
 
 {% if success %}
 <div class="alert alert-success" role="alert">
@@ -9,19 +16,27 @@
 {% endif %}
 <h1>Motivo de la consulta</h1>
 <p>Por favor, describe el motivo de tu consulta nutricional.</p>
-<h2>Selecciona paciente</h2>
-<h2>sintomas</h2>
+
+<h2>Síntomas</h2>
 <div class="row">
     <div class="col-sm-6">
         <form action="{% url 'agregar_sintoma_motivo_consulta' %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="sintomas" value="{{ sintomas|join:',' }}">
             <div class="mb-3">
-                <label for="sintomas" class="form-label">S ntomas</label>
+                <!-- <label for="sintomas" class="form-label">Síntomas</label>
                 <select name="sintoma_seleccionado" id="sintoma_seleccionado" class="form-select">
                     <option value="">Seleccione una opción</option>
                     {% for s in sintomas %}
                     <option value="{{ s.id }}">{{ s.nombre }}</option>
+                    {% endfor %}
+                </select> -->
+
+                <label class="form-label">Síntomas:</label>
+                <select class="js-example-basic-single" name="sintoma_seleccionado" style="width: 100%;"
+                    class="form-select">
+                    {% for a in sintomas %}
+                    <option value="{{ a.id }}">{{ a.nombre }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -30,26 +45,38 @@
         </form>
     </div>
     <div class="col-sm-6">
-        <a href="{% url 'vaciar_sintomas_seleccionados' %}">Vaciar sintomas</a>
-        <ul class="list-group">
+        {% if sintomas_seleccionadas %}
+        <a href="{% url 'vaciar_sintomas_seleccionados' %}" class="btn btn-warning btn-sm"
+            style="margin-bottom: 0px;margin-top: -6px;">Vaciar sintomas</a>
+        {% endif %}
+
+        <ul class="list-group" style="margin-top: 4px;">
             {% for s in sintomas_seleccionadas %}
             <li class="list-group-item">{{ s.nombre }} </li>
             {% endfor %}
         </ul>
     </div>
 </div>
-
+<br>
+<br>
 <h2>Anotaciones</h2>
 <form action="{% url 'motivo_consulta' %}" method="post">
     {% csrf_token %}
-
-
-
-
     <div class="mb-3">
-        <label for="paciente" class="form-label">Paciente</label>
-        <select name="paciente" id="paciente" class="form-select">
+        <!-- <label for="paciente" class="form-label">Paciente</label>
+        <select name="paciente" id="paciente" class="form-select" required>
             <option value="">Seleccione un paciente</option>
+            {% for p in pacientes %}
+                {% if paciente and p.id == paciente.id %}
+                 <option value="{{ p.id }}" selected>{{ p.nombre }} {{ p.apellido }}</option>
+                {% else %}
+                 <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
+                {% endif %}
+            {% endfor %}
+        </select> -->
+        <label class="form-label">Paciente:</label>
+        <br>
+        <select class="js-example-basic-single" name="paciente" class="form-select" style="width: 100%;" required>
             {% for p in pacientes %}
                 {% if paciente and p.id == paciente.id %}
                     <option value="{{ p.id }}" selected>{{ p.nombre }} {{ p.apellido }}</option>
@@ -57,9 +84,6 @@
                     <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
                 {% endif %}
             {% endfor %}
-
-
-
         </select>
     </div>
     <div class="mb-3">
@@ -73,4 +97,18 @@
     <br>
     <button type="submit" class="btn btn-success">Guardar</button>
 </form>
+{% endblock %}
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.js-example-basic-single').select2({
+            placeholder: "Selecciona una opción",
+            allowClear: true
+        });
+    });
+</script>
 {% endblock %}

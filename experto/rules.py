@@ -151,7 +151,7 @@ class ClasificacionIMC(MotorBase):
     # Bajo peso belen (salience=10 para ejecutar antes que normal)
     @Rule(Paciente(imc=P(lambda x: x < 18.5)), salience=10)
     def bajo_peso(self):
-        self.set_resultado("Bajo peso (<18.5)")
+        self.set_resultado("Bajo peso  ")
         self.set_triggered_rule({
             "rule_name": "bajo_peso",
             "classification": self.resultado,
@@ -161,7 +161,7 @@ class ClasificacionIMC(MotorBase):
     # Normal (excluyendo bajo peso y sobrepeso/obesidad)
     @Rule(Paciente(imc=P(lambda x: 18.5 <= x < 25)))
     def normal(self):
-        self.set_resultado("IMC Normal (18.5–24.9)")
+        self.set_resultado("IMC Normal ")
         self.set_triggered_rule({
             "rule_name": "normal",
             "classification": self.resultado,
@@ -171,7 +171,7 @@ class ClasificacionIMC(MotorBase):
     # Sobrepeso
     @Rule(Paciente(imc=P(lambda x: 25 <= x < 30)))
     def sobrepeso(self):
-        self.set_resultado("Sobrepeso (25–29.9)")
+        self.set_resultado("Sobrepeso")
         self.set_triggered_rule({
             "rule_name": "sobrepeso",
             "classification": self.resultado,
@@ -181,7 +181,7 @@ class ClasificacionIMC(MotorBase):
     # Obesidad grado I
     @Rule(Paciente(imc=P(lambda x: 30 <= x < 35)))
     def obesidad_I(self):
-        self.set_resultado("Obesidad grado I (30–34.9)")
+        self.set_resultado("Obesidad grado I  ")
         self.set_triggered_rule({
             "rule_name": "obesidad_I",
             "classification": self.resultado,
@@ -191,7 +191,7 @@ class ClasificacionIMC(MotorBase):
     # Obesidad grado II
     @Rule(Paciente(imc=P(lambda x: 35 <= x < 40)))
     def obesidad_II(self):
-        self.set_resultado("Obesidad grado II (35–39.9)")
+        self.set_resultado("Obesidad grado II ")
         self.set_triggered_rule({
             "rule_name": "obesidad_II",
             "classification": self.resultado,
@@ -201,7 +201,7 @@ class ClasificacionIMC(MotorBase):
     # Obesidad grado III
     @Rule(Paciente(imc=P(lambda x: x >= 40)))
     def obesidad_III(self):
-        self.set_resultado("Obesidad grado III (≥40)")
+        self.set_resultado("Obesidad grado III  ")
         self.set_triggered_rule({
             "rule_name": "obesidad_III",
             "classification": self.resultado,

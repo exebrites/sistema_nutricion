@@ -9,7 +9,7 @@ from .forms import AlimentoForm
 from django.core.paginator import Paginator
 # sistema experto
 from experto.main import evaluar_nutricion, DiagnosticoPES
- 
+
 
 # home
 
@@ -59,7 +59,7 @@ def lista_alimentos(request):
 
 def editar_alimento(request, alimento_id):
     alimento = get_object_or_404(Alimento, id=alimento_id)
-    
+
     if request.method == "POST":
         form = AlimentoForm(request.POST, instance=alimento)
         if form.is_valid():
@@ -73,7 +73,7 @@ def editar_alimento(request, alimento_id):
             })
     else:
         form = AlimentoForm(instance=alimento)
-    
+
     return render(request, "alimentos/editar.html", {
         "form": form,
         "alimento": alimento
@@ -82,11 +82,11 @@ def editar_alimento(request, alimento_id):
 
 def eliminar_alimento(request, alimento_id):
     alimento = get_object_or_404(Alimento, id=alimento_id)
-    
+
     if request.method == "POST":
         alimento.delete()
         return redirect('lista_alimentos')
-    
+
     return render(request, "alimentos/confirmar_eliminacion.html", {
         "alimento": alimento
     })
@@ -94,7 +94,7 @@ def eliminar_alimento(request, alimento_id):
 
 def alimento_detail(request, alimento_id):
     alimento = get_object_or_404(Alimento, id=alimento_id)
-    
+
     # Evaluar el alimento con el motor experto
     data = {
         "calorias": alimento.calorias,
@@ -104,7 +104,7 @@ def alimento_detail(request, alimento_id):
         "sodio": alimento.sodio,
     }
     evaluacion = evaluar_nutricion(data, modo="nutricion")
-    
+
     return render(request, "alimentos/detalle.html", {
         "alimento": alimento,
         "evaluacion": evaluacion
@@ -134,21 +134,21 @@ def ver_dieta(request, dieta_id):
 def editar_dieta(request, dieta_id):
     dieta = get_object_or_404(Dieta, id=dieta_id)
     alimentos_dieta = DietaAlimento.objects.filter(dieta=dieta)
-    
+
     if request.method == "POST":
         nombre = request.POST.get("nombre", dieta.nombre)
         descripcion = request.POST.get("descripcion", dieta.descripcion)
-        
+
         dieta.nombre = nombre
         dieta.descripcion = descripcion
         dieta.save()
-        
+
         return render(request, "dietas/editar.html", {
             "dieta": dieta,
             "alimentos_dieta": alimentos_dieta,
             "success": "Dieta actualizada correctamente."
         })
-    
+
     return render(request, "dietas/editar.html", {
         "dieta": dieta,
         "alimentos_dieta": alimentos_dieta
@@ -157,11 +157,11 @@ def editar_dieta(request, dieta_id):
 
 def eliminar_dieta(request, dieta_id):
     dieta = get_object_or_404(Dieta, id=dieta_id)
-    
+
     if request.method == "POST":
         dieta.delete()
         return redirect('lista_dietas')
-    
+
     return render(request, "dietas/confirmar_eliminacion.html", {
         "dieta": dieta
     })
@@ -285,35 +285,34 @@ def crear_paciente(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         apellido = request.POST.get("apellido")
-        edad = request.POST.get("edad")
+        dni = request.POST.get("dni")
         sexo = request.POST.get("sexo")
         fecha_nacimiento_str = request.POST.get("fecha_nacimiento")
         direccion_residencial = request.POST.get("direccion_residencial")
         numero_telefono = request.POST.get("numero_telefono")
-        # calculo de la edad 
+        # calculo de la edad
         fecha_nacimiento = None
         edad_calculada = None
         if fecha_nacimiento_str:
             try:
-                fecha_nacimiento = datetime.datetime.strptime(fecha_nacimiento_str, "%Y-%m-%d").date()
+                fecha_nacimiento = datetime.datetime.strptime(
+                    fecha_nacimiento_str, "%Y-%m-%d").date()
                 today = datetime.date.today()
-                edad_calculada = today.year - fecha_nacimiento.year - ((today.month, today.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+                edad_calculada = today.year - fecha_nacimiento.year - \
+                    ((today.month, today.day) <
+                     (fecha_nacimiento.month, fecha_nacimiento.day))
             except ValueError:
                 edad_calculada = None
 
-
-
-
-
-
         # 1. Aquí puedes guardar los datos del paciente en la base de datos
-        # 2. Controlar que el nombre y apellido no existan en la base de datos
-        paciente_existe = Paciente.objects.filter(
-            nombre=nombre, apellido=apellido).first()
-        if paciente_existe:
-            context["error"] = "El paciente con nombre {} y apellido {} ya existe en la base de datos.".format(
-                nombre, apellido)
+        # 2. Controlar que el dni no existan en la base de datos
+        paciente_existe_dni = Paciente.objects.filter(dni=dni).first()
+
+        if paciente_existe_dni:
+            context["error"] = "El paciente con dni {} ya existe en la base de datos.".format(
+                dni)
             return render(request, "consultas/primera_consulta.html", context)
+
         try:
             paciente = Paciente.objects.create(
                 nombre=nombre,
@@ -323,6 +322,7 @@ def crear_paciente(request):
                 fecha_nacimiento=fecha_nacimiento,
                 direccion_residencial=direccion_residencial,
                 numero_telefono=numero_telefono,
+                dni=dni
             )
             request.session["success"] = "Paciente creado exitosamente."
             request.session["paciente_id"] = paciente.id
@@ -340,13 +340,13 @@ def agregar_sintoma_motivo_consulta(request):
     context = {}
     if "sintomas_seleccionadas" not in request.session:
         request.session["sintomas_seleccionadas"] = []
-    
+
     if request.method == "GET":
         # GET: renderizar opciones de síntomas
         context["sintomas"] = sintomas
         context["sintomas_seleccionadas"] = request.session["sintomas_seleccionadas"]
         return render(request, "consultas/agregar_sintoma.html", context)
-    
+
     elif request.method == "POST":
         id_sintoma_seleccionado = request.POST.getlist("sintoma_seleccionado")
         sintoma_seleccionado = Sintoma.objects.filter(
@@ -371,7 +371,7 @@ def agregar_sintoma_motivo_consulta(request):
         # Aquí puedes procesar los síntomas seleccionados según tus necesidades
         return redirect('motivo_consulta')
         # return render(request, "consultas/motivo_consulta.html", context)
-    
+
     return HttpResponse("Método no permitido.", status=405)
 
 
@@ -490,14 +490,14 @@ def agregar_alimento(request):
     context = {}
     if "lista_alimentos_seleccionados" not in request.session:
         request.session["lista_alimentos_seleccionados"] = []
-    
+
     if request.method == "GET":
         # GET: renderizar opciones de alimentos
         alimentos = Alimento.objects.all()
         context["alimentos"] = alimentos
         context["lista_alimentos_seleccionados"] = request.session["lista_alimentos_seleccionados"]
         return render(request, "consultas/agregar_alimento.html", context)
-    
+
     elif request.method == "POST":
         alimento_seleccionado = request.POST.get("alimentos")
         if "lista_alimentos_seleccionados" not in request.session:
@@ -570,14 +570,15 @@ def informacion_general(request):
         paciente=paciente).last()
     dieta = Dieta.objects.filter(paciente=paciente).last()
     # clasificar el imc sistema experto
-  
-    resultado, regla_activada = DiagnosticoPES.clasificar_imc(antropometria.imc)
+
+    resultado, regla_activada = DiagnosticoPES.clasificar_imc(
+        antropometria.imc)
     diagnostico_problema = {
         'explicacion': f"El paciente tiene un IMC de {antropometria.imc:.2f}, lo que lo clasifica como '{resultado}'.",
         'clasificacion': resultado,
         'regla_activada': regla_activada
     }
-    
+
     context = {"paciente": paciente,
                "motivo_consulta": motivo_consulta,
                "antropometria": antropometria,
