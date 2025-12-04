@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% url 'lista_dietas' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar dieta" subtitle="Detalles de la dieta" back_url=url_volver %}
+
+
+ <h1>Dieta {{ dieta.nombre }} </h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Alimento</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in alimentos_dieta %}
+        <tr>
+            <td>{{ a.alimento.nombre }}</td>
+            <td>{{ a.cantidad }}</td>
+            <td>{{ a.unidad }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
