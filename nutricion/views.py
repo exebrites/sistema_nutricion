@@ -170,22 +170,31 @@ def eliminar_dieta(request, dieta_id):
 def crear_dieta(request):
     carrito_dieta = request.session.get("carrito_dieta", [])
     resumen_dieta = request.session.get("datos_analisis_temporal", {})
+    # obtener todos los pacientes
+    pacientes = Paciente.objects.all()
     context = {
         "carrito_dieta": carrito_dieta,
-        "resumen_dieta": resumen_dieta
+        "resumen_dieta": resumen_dieta,
+        "pacientes": pacientes
     }
     if request.method == "POST":
         # validar lista de alimentos
         if not carrito_dieta:
             context["error"] = "La dieta debe contener al menos un alimento."
             return render(request, "dietas/form.html", context)
-        # return HttpResponse(json.dumps(carrito_dieta[1]['id']))
+
+       # obtener pacientes
+        paciente_id = request.POST.get("paciente")
+        paciente = get_object_or_404(Paciente, id=paciente_id)
         # obtneer todos los alimentos
         # crear una dieta
         # crear un detalle de dieta por cada alimento
+
         dieta = Dieta.objects.create(
-            nombre=request.POST.get("nombre", "Dieta sin nombre"),
-            descripcion=request.POST.get("descripcion", ""))
+            nombre=request.POST.get("nombre", paciente.nombre),
+            descripcion=request.POST.get("descripcion", ""),
+            paciente=paciente)
+
         for alimento_carrito in carrito_dieta:
             alimento = Alimento.objects.get(id=alimento_carrito["id"])
             DietaAlimento.objects.create(

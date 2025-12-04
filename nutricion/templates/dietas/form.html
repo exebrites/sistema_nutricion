@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 
 {% url 'lista_dietas' as url_volver %}
@@ -9,11 +13,19 @@
     {% csrf_token %}
     <div class="row">
         <div class="row">
-            <div class="col-sm-6">  
-                <div class="form-group">
+            <div class="col-sm-6">
+                <!-- <div class="form-group">
                     <label for="nombre" class="control-label">Nombre:</label>
                     <input type="text" name="nombre" id="nombre" class="form-control" required>
-                </div>
+                </div> -->
+                <label class="form-label">Paciente:</label>
+                <br>
+                <select class="js-example-basic-single" name="paciente" class="form-select" style="width: 100%;"
+                    required>
+                    {% for p in pacientes %}
+                    <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
+                    {% endfor %}
+                </select>
                 <div class="form-group">
                     <label for="descripcion" class="control-label">Descripci&oacute;n:</label>
                     <textarea name="descripcion" id="descripcion" cols="30" rows="10" class="form-control"></textarea>
@@ -70,4 +82,18 @@
     </div>
 </form>
 
+{% endblock %}
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.js-example-basic-single').select2({
+            placeholder: "Selecciona una opción",
+            allowClear: true
+        });
+    });
+</script>
 {% endblock %}
