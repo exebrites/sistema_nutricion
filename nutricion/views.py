@@ -124,7 +124,9 @@ def lista_dietas(request):
 
 def ver_dieta(request, dieta_id):
     dieta = Dieta.objects.get(id=dieta_id)
+
     alimentos_dieta = DietaAlimento.objects.filter(dieta=dieta)
+    
     return render(request, "dietas/ver_dieta.html", {
         "dieta": dieta,
         "alimentos_dieta": alimentos_dieta
@@ -183,6 +185,7 @@ def crear_dieta(request):
             context["error"] = "La dieta debe contener al menos un alimento."
             return render(request, "dietas/form.html", context)
 
+      
        # obtener pacientes
         paciente_id = request.POST.get("paciente")
         paciente = get_object_or_404(Paciente, id=paciente_id)
@@ -203,6 +206,7 @@ def crear_dieta(request):
                 cantidad=alimento_carrito["cantidad"],
                 unidad=alimento_carrito["unidad"],
             )
+        
         request.session["carrito_dieta"] = []
         request.session["datos_analisis_temporal"] = {}
         return redirect('lista_dietas')
