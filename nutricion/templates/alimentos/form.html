@@ -15,32 +15,42 @@
 </form>
 
 {% if success %}
-<p style="color: green">{{ success }}</p>
+<div class="alert alert-success" role="alert">
+    <strong>{{ success }}</strong>
+</div>
 {% endif %}
 
 {% if form.errors %}
-<ul style="color: red">
-    {% for error in form.non_field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-</ul>
+<div class="alert alert-danger" role="alert">
+    <strong>Errores en el formulario:</strong>
+    <ul class="mb-0">
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endif %}
 
 {% if advertencias %}
-<h3>Advertencias del sistema experto:</h3>
-<ul style="color: orange">
-    {% for a in advertencias %}
-    <li>{{ a }}</li>
-    {% endfor %}
-</ul>
+<div class="alert alert-warning" role="alert">
+    <strong>Advertencias del sistema experto:</strong>
+    <ul class="mb-0">
+        {% for a in advertencias %}
+        <li>{{ a }}</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endif %}
 
 {% if info %}
-<h3>Clasificaciones:</h3>
-<ul style="color: blue">
-    {% for i in info %}
-    <li>{{ i }}</li>
-    {% endfor %}
-</ul>
+<div class="alert alert-info" role="alert">
+    <strong>Clasificaciones:</strong>
+    <ul class="mb-0">
+        {% for i in info %}
+        <li>{{ i }}</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endif %}
 {% endblock %}
+

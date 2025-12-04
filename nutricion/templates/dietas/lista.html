@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 {% url 'index' as url_volver %}
 
 {% include 'components/page_header.html' with title="Gestionar dieta" subtitle="Listado de dietas" back_url=url_volver %}
@@ -10,7 +11,7 @@
         <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Descripci n</th>
+                <th>Descripción</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,5 +29,6 @@
             {% endfor %}
         </tbody>
     </table>
-    {% include 'components/pagination.html' %}
+
+{% include 'components/pagination.html' %}
 {% endblock %}
