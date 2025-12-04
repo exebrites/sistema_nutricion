@@ -1,59 +1,94 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
-    <h1>Alimento y habitos alimenticios</h1>
-    <p>Por favor, describe tus alimentos y habitos alimenticios.</p>
-    <h2>Alimentos</h2>
-    <div class="row">
-        <div class="col-sm-6">
-            <form action="{% url 'agregar_alimento' %}" method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="alimentos" class="form-label">Alimentos</label>
-                    <select name="alimentos" id="alimentos" class="form-select">
+
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar consulta" subtitle="Alimento y habitos alimenticios" back_url=url_volver %}
+<div class="row">
+    <div class="col-sm-6">
+        <h2>Alimentos</h2>
+        <form action="{% url 'agregar_alimento' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <!-- <select name="alimentos" id="alimentos" class="form-select">
                         <option value="">Seleccione un alimento</option>
                         {% for a in alimentos %}
                             <option value="{{ a.id }}">{{ a.nombre }}</option>
                         {% endfor %}
-                    </select>
+                    </select> -->
+                <select class="js-example-basic-single" name="alimentos" style="width: 100%;" class="form-select">
+                    {% for a in alimentos %}
+                    <option value="{{ a.id }}">{{ a.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+            <div class="mb-3">
+                <label for="consume" class="form-label">Consume</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="consume" id="consume">
+                    <label class="form-check-label" for="consume">Sí</label>
                 </div>
-                <div class="mb-3">
-                    <label for="consume" class="form-label">Consume</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="consume" id="consume">
-                        <label class="form-check-label" for="consume">S</label>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Agregar alimento</button>
-            </form>
-        </div>
-        <div class="col-sm-6">
-            <h2>Lista de alimentos seleccionados</h2>
-            <a href="{% url 'vaciar_lista_alimentos_seleccionados' %}">vaciar alimentos</a>
-            <ul class="list-group">
-                {% for a in lista_alimentos_seleccionados %}
-                <li class="list-group-item">{{ a.nombre }} ({{ a.consume|yesno:"Si,No" }})</li>
-                {% endfor %}
-            </ul>
-        </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar alimento</button>
+        </form>
     </div>
-    <hr>
-    <h3>habitos alimenticios</h3>
-    <form action="{% url 'alimentos_habitos' %}" method="post">
+    <div class="col-sm-6">
+        <h2>Lista de alimentos seleccionados</h2>
+        {% if lista_alimentos_seleccionados %}
+        <a href="{% url 'vaciar_lista_alimentos_seleccionados' %}" class="btn btn-warning btn-sm">vaciar alimentos</a>
+        <ul class="list-group">
+            {% else %}
+            <p>No hay alimentos seleccionados.</p>
+            {% endif %}
+            {% for a in lista_alimentos_seleccionados %}
+            <li class="list-group-item">{{ a.nombre }} ({{ a.consume|yesno:"Si,No" }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<hr>
+<h2>Hábitos alimenticios</h2>
+<form action="{% url 'alimentos_habitos' %}" method="post">
 
-        {% csrf_token %}
+    {% csrf_token %}
 
-        <input type="hidden" name="paciente_id" value="{{ paciente.id }}">
-        <div class="mb-3">
-            <label for="habitos" class="form-label">Habitos alimentarios</label>
-            <select name="habitos" id="habitos" class="form-select">
-                <option value="">Seleccione un habito alimentario</option>
-                {% for h in habitos_alimentarios %}
-                    <option value="{{ h.id }}">{{ h.nombre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <br>
-            <button type="submit" class="btn btn-primary">Guardar habitos alimenticios</button>
-    </form>
+    <input type="hidden" name="paciente_id" value="{{ paciente.id }}">
+    <div class="mb-3">
+
+        <!-- <select name="habitos" id="habitos" class="form-select">
+            <option value="">Seleccione un habito alimentario</option>
+            {% for h in habitos_alimentarios %}
+            <option value="{{ h.id }}">{{ h.nombre }}</option>
+            {% endfor %}
+        </select> -->
+
+        <select class="js-example-basic-single" name="habitos" style="width: 100%;" class="form-select">
+            {% for h in habitos_alimentarios %}
+                <option value="{{ h.id }}">{{ h.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-success">Guardar habitos alimenticios</button>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.js-example-basic-single').select2({
+            placeholder: "Selecciona una opción",
+            allowClear: true
+        });
+    });
+</script>
 {% endblock %}
