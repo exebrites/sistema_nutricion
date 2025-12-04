@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar consulta" subtitle="Nuevo paciente" back_url=url_volver %}
+
     {% if error %}
     <div class="alert alert-danger" role="alert">
         {{ error }}
     </div>
     {% endif %}
-    <h1>Primera consulta</h1>
+  
     <p>Bienvenido a la sección de la primera consulta nutricional. Aquí podrás encontrar información y recursos para tu evaluación inicial.</p>
     <h2>Datos del paciente</h2>
     <form action="{% url 'crear_paciente' %}" method="post">

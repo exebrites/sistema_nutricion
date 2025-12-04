@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Gestionar consulta" subtitle="Motivo de la consulta" back_url=url_volver %}
 
 {% if success %}
 <div class="alert alert-success" role="alert">
@@ -29,8 +32,9 @@
                     {% endfor %}
                 </select> -->
 
-                <label  class="form-label">Síntomas:</label>
-                <select class="js-example-basic-single" name="sintoma_seleccionado" style="width: 100%;" class="form-select">
+                <label class="form-label">Síntomas:</label>
+                <select class="js-example-basic-single" name="sintoma_seleccionado" style="width: 100%;"
+                    class="form-select">
                     {% for a in sintomas %}
                     <option value="{{ a.id }}">{{ a.nombre }}</option>
                     {% endfor %}
@@ -58,24 +62,28 @@
 <h2>Anotaciones</h2>
 <form action="{% url 'motivo_consulta' %}" method="post">
     {% csrf_token %}
-
-
-
-
     <div class="mb-3">
-        <label for="paciente" class="form-label">Paciente</label>
-        <select name="paciente" id="paciente" class="form-select">
+        <!-- <label for="paciente" class="form-label">Paciente</label>
+        <select name="paciente" id="paciente" class="form-select" required>
             <option value="">Seleccione un paciente</option>
             {% for p in pacientes %}
-            {% if paciente and p.id == paciente.id %}
-            <option value="{{ p.id }}" selected>{{ p.nombre }} {{ p.apellido }}</option>
-            {% else %}
-            <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
-            {% endif %}
+                {% if paciente and p.id == paciente.id %}
+                 <option value="{{ p.id }}" selected>{{ p.nombre }} {{ p.apellido }}</option>
+                {% else %}
+                 <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
+                {% endif %}
             {% endfor %}
-
-
-
+        </select> -->
+        <label class="form-label">Paciente:</label>
+        <br>
+        <select class="js-example-basic-single" name="paciente" class="form-select" style="width: 100%;" required>
+            {% for p in pacientes %}
+                {% if paciente and p.id == paciente.id %}
+                    <option value="{{ p.id }}" selected>{{ p.nombre }} {{ p.apellido }}</option>
+                {% else %}
+                    <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }}</option>
+                {% endif %}
+            {% endfor %}
         </select>
     </div>
     <div class="mb-3">
