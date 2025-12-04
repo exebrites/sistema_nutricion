@@ -77,7 +77,7 @@ class Paciente(models.Model):
     direccion_residencial = models.CharField(max_length=200)
     numero_telefono = models.CharField(max_length=20)
     edad = models.IntegerField()
-
+    dni = models.CharField(max_length=20, blank=True, null=True, unique=True)
     def __str__(self):
         return f"{self.nombre} {self.apellido}, nacido el {self.fecha_nacimiento.strftime('%d-%m-%Y')}"
     # calcular edad
