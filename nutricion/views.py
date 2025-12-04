@@ -287,9 +287,24 @@ def crear_paciente(request):
         apellido = request.POST.get("apellido")
         edad = request.POST.get("edad")
         sexo = request.POST.get("sexo")
-        fecha_nacimiento = request.POST.get("fecha_nacimiento")
+        fecha_nacimiento_str = request.POST.get("fecha_nacimiento")
         direccion_residencial = request.POST.get("direccion_residencial")
         numero_telefono = request.POST.get("numero_telefono")
+        # calculo de la edad 
+        fecha_nacimiento = None
+        edad_calculada = None
+        if fecha_nacimiento_str:
+            try:
+                fecha_nacimiento = datetime.datetime.strptime(fecha_nacimiento_str, "%Y-%m-%d").date()
+                today = datetime.date.today()
+                edad_calculada = today.year - fecha_nacimiento.year - ((today.month, today.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+            except ValueError:
+                edad_calculada = None
+
+
+
+
+
 
         # 1. Aquí puedes guardar los datos del paciente en la base de datos
         # 2. Controlar que el nombre y apellido no existan en la base de datos
@@ -304,7 +319,7 @@ def crear_paciente(request):
                 nombre=nombre,
                 apellido=apellido,
                 sexo=sexo,
-                edad=edad,
+                edad=edad_calculada,
                 fecha_nacimiento=fecha_nacimiento,
                 direccion_residencial=direccion_residencial,
                 numero_telefono=numero_telefono,
