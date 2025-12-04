@@ -5,6 +5,10 @@ from datetime import datetime
 
 
 class AlimentoForm(forms.ModelForm):
+    fecha_vencimiento = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
     class Meta:
         model = Alimento
         fields = "__all__"
