@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="display-4 text-center">Informaci n general</h1>
+{% url 'index' as url_volver %}
+
+{% include 'components/page_header.html' with title="Información general" subtitle="" back_url=url_volver %}
+
+
+ 
 <h2 class="display-5 text-center">Datos del paciente</h2>
 <table class="table table-bordered">
     <thead>
@@ -10,8 +15,8 @@
             <th>Apellido</th>
             <th>Edad</th>
             <th>Sexo</th>
-            <th>Direcci n</th>
-            <th>N mero de tel fono</th>
+            <th>Dirección</th>
+            <th>Número de teléfono</th>
         </tr>
     </thead>
     <tbody>
@@ -19,7 +24,7 @@
             <td>{{ paciente.nombre }}</td>
             <td>{{ paciente.apellido }}</td>
             <td>{{ paciente.edad }}</td>
-            <td>{{ paciente.sexo }}</td>
+            <td>{% if paciente.sexo == 'M' %}Masculino{% else %}Femenino{% endif %}</td>
             <td>{{ paciente.direccion_residencial }}</td>
             <td>{{ paciente.numero_telefono }}</td>
         </tr>
@@ -29,20 +34,19 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Nombre</th>
-            <th>Descripci n</th>
+            <th>Descripción</th>
             <th>Alimentos</th>
-            <th>Fecha de creaci n</th>
+            <th>Fecha de creación</th>
         </tr>
     </thead>
     <tbody>
         {% for d in paciente.dietas.all %}
         <tr>
-            <td>{{ d.nombre }}</td>
+            
             <td>{{ d.descripcion }}</td>
             <td>
                 {% for da in d.alimentos.all %}
-                {{ da.nombre }} ({{ da.cantidad }} {{ da.unidad }})
+                {{ da.nombre }} 
                 {% if not forloop.last %}
                 ,
                 {% endif %}
@@ -58,19 +62,20 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Paciente</th>
-            <th>Fecha de consulta</th>
+           
+         
             <th>Motivo</th>
             <th>Observaciones</th>
 
-            <th>S ntomas</th>
+            <th>Síntomas</th>
+               <th>Fecha de consulta</th>
         </tr>
     </thead>
     <tbody>
 
         <tr>
-            <td>{{ paciente.nombre }} {{ paciente.apellido }}</td>
-            <td>{{ motivo_consulta.fecha_consulta|date:"d/m/Y" }}</td>
+          
+           
             <td>{{ motivo_consulta.motivo }}</td>
             <td>{{ motivo_consulta.observaciones }}</td>
 
@@ -82,6 +87,7 @@
                 {% endif %}
                 {% endfor %}
             </td>
+             <td>{{ motivo_consulta.fecha_consulta|date:"d/m/Y" }}</td>
         </tr>
 
     </tbody>
@@ -91,36 +97,42 @@
     <thead>
         <tr>
 
-            <th>Fecha de medici n</th>
+          
             <th>Peso corporal (kg)</th>
             <th>Altura (cm)</th>
             <th>IMC</th>
             <th>Perímetro abdominal (cm)</th>
-
+  <th>Fecha de medición</th>
         </tr>
     </thead>
     <tbody>
 
         <tr>
 
-            <td>{{ antropometria.fecha_medicion|date:"d/m/Y" }}</td>
+          
             <td>{{ antropometria.peso_corporal }}</td>
             <td>{{ antropometria.altura }}</td>
             <td>{{ antropometria.imc|floatformat:2 }}</td>
             <td>{{ antropometria.perimetro_abdominal }}</td>
-
+  <td>{{ antropometria.fecha_medicion|date:"d/m/Y" }}</td>
         </tr>
 
     </tbody>
 
 </table>
-<h2 class="display-5 text-center">Diagnosticos sistema experto</h2>
-
-<p>Diagnosticos: {{diagnostico_problema.explicacion}}</p>
-<ul class="list-group">
-    <li class="list-group-item">Resultado: {{diagnostico_problema.clasificacion}}</li>
-    <li class="list-group-item">Reglas activadas: {{diagnostico_problema.regla_activada.rule_name}}</li>
-    <li class="list-group-item">Clasificaci n: {{diagnostico_problema.regla_activada.classification}}</li>
-    <li class="list-group-item">Condici n: {{diagnostico_problema.regla_activada.condition}}</li>
-</ul>
+<div style="background-color: #e9ecef;">
+    <h2 class="display-5 text-center">Diagnosticos sistema experto</h2>
+    <br>
+    <p><strong>Diagnosticos:</strong> {{diagnostico_problema.explicacion}}</p>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Clasificación:</span>
+            <span>{{diagnostico_problema.regla_activada.classification}}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Condición:</span>
+            <span>{{diagnostico_problema.regla_activada.condition}}</span>
+        </li>
+    </ul>
+</div>
 {% endblock %}
